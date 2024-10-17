@@ -17,9 +17,6 @@ build:
     - echo "$CI_REGISTRY_PASSWORD" | docker login hub.laberit.com -u "$CI_REGISTRY_USER" --password-stdin
     - docker build -t hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project -f Dockerfile .
     - docker push hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project
-  artifacts:
-    paths:
-      - target/*.jar
   tags:
     - bootcamp
   only:
