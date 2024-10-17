@@ -6,4 +6,26 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=myuser'
     ports:
-      - '5432'
+      - '5451:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  myapp:
+    image: 'hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project'
+    container_name: hospital-backend
+    depends_on:
+      - postgres
+    ports:
+      - '8051:8080'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5451/mydatabase
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=secret
+    volumes:
+      - ./config:/app/config
+    working_dir: /app
+    command: ["java", "-jar", "/app/app.jar"]
+
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,45 @@
+stages:
+  - build
+  - tests
+  - deploy
+
+variables:
+  POSTGRES_DB: mydatabase
+  POSTGRES_USER: myuser
+  POSTGRES_PASSWORD: secret
+
+build:
+  stage: build
+  image: maven:3.9.9-eclipse-temurin-21-alpine
+  script:
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+  tags:
+    - bootcamp
+  only:
+    - dev
+
+tests:
+  stage: tests
+  script:
+    - echo "This will run tests before deploying"
+    - echo "PD:First we need to write tests"
+  tags:
+    - bootcamp
+  only:
+    - dev
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login hub.laberit.com -u "$CI_REGISTRY_USER" --password-stdin
+    - docker build -t hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project .
+    - docker push hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project
+    - docker-compose up -d myapp
+  tags:
+    - bootcamp
+  only:
+    - dev
