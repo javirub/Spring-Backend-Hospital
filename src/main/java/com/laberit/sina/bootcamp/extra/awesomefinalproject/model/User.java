@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
+@Table(name = "\"user\"")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
