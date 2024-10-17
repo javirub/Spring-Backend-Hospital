@@ -1,10 +1,11 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Role;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,27 +14,34 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Override
     @Transactional
-    public boolean registerUser(String username, String password, String name, String surnames, Role role){
-        if (userRepository.findByUsername(username).isPresent()) {
+    public User registerUser(UserDTO userDTO) {
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPassword(encodePassword(password));
-        newUser.setName(name);
-        newUser.setSurnames(surnames);
-        newUser.setRole(role);
-        userRepository.save(newUser);
-        return true;
-    }
 
-    @Override
-    public String encodePassword(String password) {
-        return passwordEncoder.encode(password);
+
+        // Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        // Comprobar si el usuario tiene los permisos necesarios
+        boolean hasPermission = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority ->
+                        grantedAuthority.getAuthority().equals("CREATE_ADMIN") ||
+                                grantedAuthority.getAuthority().equals("CREATE_MANAGER") ||
+                                grantedAuthority.getAuthority().equals("CREATE_DOCTOR")
+                );
+
+        if (!hasPermission) {
+            throw new RuntimeException("User does not have the required permissions");
+        }
+
+        User newUser = new User(userDTO);
+        userRepository.save(newUser);
+        return newUser;
     }
 }

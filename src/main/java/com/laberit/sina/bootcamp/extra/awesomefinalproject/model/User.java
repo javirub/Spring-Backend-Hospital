@@ -1,16 +1,19 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Permissions;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -21,17 +24,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is mandatory")
     private String name;
-
-    @NotBlank(message = "Username is mandatory")
     private String username;
-
-    @NotBlank(message = "Surnames are mandatory")
     private String surnames;
-
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -44,12 +39,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String username, String surnames, String password, Role role) {
-        this.name = name;
-        this.username = username;
-        this.surnames = surnames;
-        this.password = password;
-        this.role = role;
+    public User(UserDTO userDTO) {
+        this.name = userDTO.getName();
+        this.username = userDTO.getUsername();
+        this.surnames = userDTO.getSurnames();
+        this.password = userDTO.getPassword();
+        this.role = Role.valueOf(userDTO.getRole());
         this.permissions = assignPermissionsBasedOnRole(role);
     }
 
@@ -72,10 +67,17 @@ public class User {
                 permissions.add(Permissions.WRITE_USER);
                 permissions.add(Permissions.READ_PATIENT);
                 permissions.add(Permissions.WRITE_PATIENT);
+                permissions.add(Permissions.CREATE_DOCTOR);
                 break;
             default:
                 break;
         }
         return permissions;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.permissions.stream()
+                .map(permission -> new SimpleGrantedAuthority(permission.name()))
+                .collect(Collectors.toList());
     }
 }

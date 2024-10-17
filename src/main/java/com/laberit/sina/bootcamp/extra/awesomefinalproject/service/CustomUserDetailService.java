@@ -3,10 +3,13 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
@@ -22,10 +25,12 @@ public class CustomUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("User role not found for user: " + username);
         }
 
+        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().name())
+                .authorities(authorities)
                 .build();
     }
 }
