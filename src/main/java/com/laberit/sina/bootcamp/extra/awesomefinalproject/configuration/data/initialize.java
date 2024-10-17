@@ -25,7 +25,7 @@ public class initialize implements CommandLineRunner {
     }
 
     private void initializeUsers() {
-        if (userRepository.count() > 0) {
+        if (userRepository.count() == 0) {
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername("admin");
             userDTO.setPassword(passwordEncoder.encode("admin"));
