@@ -10,9 +10,13 @@ variables:
 
 build:
   stage: build
-  image: maven:3.9.9-eclipse-temurin-21-alpine
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - mvn clean package -DskipTests
+    - echo "$CI_REGISTRY_PASSWORD" | docker login hub.laberit.com -u "$CI_REGISTRY_USER" --password-stdin
+    - docker build -t hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project -f Dockerfile .
+    - docker push hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project
   artifacts:
     paths:
       - target/*.jar
@@ -36,8 +40,6 @@ deploy:
   image: docker:latest
   script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login hub.laberit.com -u "$CI_REGISTRY_USER" --password-stdin
-    - docker build -t hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project -f Dockerfile .
-    - docker push hub.laberit.com/sina/bootcamp-backend/m-dulo-5/my-awesome-final-project
     - docker-compose up -d myapp
   tags:
     - bootcamp
