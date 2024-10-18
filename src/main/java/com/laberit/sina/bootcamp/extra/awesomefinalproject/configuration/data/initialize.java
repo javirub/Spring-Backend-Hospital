@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+
 @Component
 public class initialize implements CommandLineRunner {
 
@@ -23,13 +25,13 @@ public class initialize implements CommandLineRunner {
     private RoleRepository roleRepository;
 
     @Override
-    @Transactional
     public void run(String... args) {
         initializeRoles();
         initializeUsers();
     }
 
-    private void initializeUsers() {
+    @Transactional
+    protected void initializeUsers() {
         if (userRepository.count() == 0) {
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername("admin");
@@ -40,14 +42,14 @@ public class initialize implements CommandLineRunner {
         }
     }
 
-    private void initializeRoles() {
+    @Transactional
+    protected void initializeRoles() {
         if (roleRepository.count() == 0) {
-            Role role = new Role(RoleName.ADMIN);
-            roleRepository.save(role);
-            role = new Role(RoleName.DOCTOR);
-            roleRepository.save(role);
-            role = new Role(RoleName.MANAGER);
-            roleRepository.save(role);
+            roleRepository.saveAll(Arrays.asList(
+                    new Role(RoleName.ADMIN),
+                    new Role(RoleName.DOCTOR),
+                    new Role(RoleName.MANAGER)
+            ));
         }
     }
 }
