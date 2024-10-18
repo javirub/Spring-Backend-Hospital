@@ -1,7 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Gender;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,13 +37,4 @@ public class Patient {
             inverseJoinColumns = @JoinColumn(name = "doctor_id")
     )
     private List<User> doctors;
-
-    public void setDoctors(List<User> doctors) {
-        for (User doctor : doctors) {
-            if (doctor.getRole() != Role.DOCTOR) {
-                throw new IllegalArgumentException("The user " + doctor.getUsername() + " is not a doctor");
-            }
-        }
-        this.doctors = doctors;
-    }
 }

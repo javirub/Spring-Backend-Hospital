@@ -2,7 +2,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.configuration.data;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Role;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -29,7 +29,7 @@ public class initialize implements CommandLineRunner {
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername("admin");
             userDTO.setPassword(passwordEncoder.encode("admin"));
-            userDTO.setRole(String.valueOf(Role.ADMIN));
+            userDTO.setRolename(String.valueOf(RoleName.ADMIN));
             User user = new User(userDTO);
             userRepository.save(user);
         }
