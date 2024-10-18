@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+
     @Override
     @Transactional
     public User registerUser(UserDTO userDTO) {
@@ -49,5 +50,17 @@ public class UserServiceImpl implements UserService {
         User newUser = new User(userDTO, role);
         userRepository.save(newUser);
         return newUser;
+    }
+
+    @Override
+    @Transactional
+    public Boolean changePassword(String password) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(password);
+        userRepository.save(user);
+        return true;
     }
 }
