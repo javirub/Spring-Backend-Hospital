@@ -17,7 +17,7 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private RoleName role;
+    private RoleName name;
 
     @ElementCollection(targetClass = Permissions.class)
     @Enumerated(EnumType.STRING)
@@ -26,8 +26,8 @@ public class Role {
     public Role() {
     }
 
-    public Role(RoleName role) {
-        this.role = role;
-        this.permissions = role.getPermissions();
+    public Role(RoleName name) {
+        this.name = name;
+        this.permissions = name.getPermissions();
     }
 }

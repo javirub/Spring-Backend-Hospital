@@ -1,10 +1,10 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.configuration.data;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -25,25 +25,24 @@ public class initialize implements CommandLineRunner {
     private RoleRepository roleRepository;
 
     @Override
+    @Transactional
     public void run(String... args) {
         initializeRoles();
         initializeUsers();
     }
 
-    @Transactional
-    protected void initializeUsers() {
+    private void initializeUsers() {
         if (userRepository.count() == 0) {
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername("admin");
             userDTO.setPassword(passwordEncoder.encode("admin"));
-            userDTO.setRolename(String.valueOf(RoleName.ADMIN));
+            userDTO.setRole(roleRepository.findByName(RoleName.ADMIN).orElseThrow());
             User user = new User(userDTO);
             userRepository.save(user);
         }
     }
 
-    @Transactional
-    protected void initializeRoles() {
+    private void initializeRoles() {
         if (roleRepository.count() == 0) {
             roleRepository.saveAll(Arrays.asList(
                     new Role(RoleName.ADMIN),
