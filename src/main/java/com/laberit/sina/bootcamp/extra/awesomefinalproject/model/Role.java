@@ -20,7 +20,7 @@ public class Role {
     @Column(unique = true)
     private RoleName name;
 
-    @ElementCollection(targetClass = Permissions.class)
+    @ElementCollection(targetClass = Permissions.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private List<Permissions> permissions;
 

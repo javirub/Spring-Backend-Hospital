@@ -20,13 +20,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
     @Column(unique = true)
     private String username;
 
-    private String surnames;
     private String password;
+    private String name;
+    private String surnames;
+
 
     @ManyToOne
     @JoinColumn(name = "role_id")
