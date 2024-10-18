@@ -17,6 +17,7 @@ public class Role {
     private Short id;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private RoleName name;
 
     @ElementCollection(targetClass = Permissions.class)

@@ -1,7 +1,9 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -39,8 +44,9 @@ public class UserServiceImpl implements UserService {
         if (!hasPermission) {
             throw new RuntimeException("User does not have the required permissions");
         }
-
-        User newUser = new User(userDTO);
+        Role role = roleRepository.findByName(userDTO.getRole())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        User newUser = new User(userDTO, role);
         userRepository.save(newUser);
         return newUser;
     }

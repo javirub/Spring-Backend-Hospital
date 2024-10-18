@@ -35,12 +35,12 @@ public class User {
     public User() {
     }
 
-    public User(UserDTO userDTO) {
+    public User(UserDTO userDTO, Role role) {
         this.name = userDTO.getName();
         this.username = userDTO.getUsername();
         this.surnames = userDTO.getSurnames();
         this.password = userDTO.getPassword();
-        this.role = userDTO.getRole();
+        this.role = role;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
