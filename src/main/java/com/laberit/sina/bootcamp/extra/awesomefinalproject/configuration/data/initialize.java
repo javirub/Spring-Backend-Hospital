@@ -1,5 +1,7 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.configuration.data;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
@@ -17,10 +19,13 @@ public class initialize implements CommandLineRunner {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     @Transactional
     public void run(String... args) {
+        initializeRoles();
         initializeUsers();
     }
 
@@ -32,6 +37,17 @@ public class initialize implements CommandLineRunner {
             userDTO.setRolename(String.valueOf(RoleName.ADMIN));
             User user = new User(userDTO);
             userRepository.save(user);
+        }
+    }
+
+    private void initializeRoles() {
+        if (roleRepository.count() == 0) {
+            Role role = new Role(RoleName.ADMIN);
+            roleRepository.save(role);
+            role = new Role(RoleName.DOCTOR);
+            roleRepository.save(role);
+            role = new Role(RoleName.MANAGER);
+            roleRepository.save(role);
         }
     }
 }
