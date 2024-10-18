@@ -39,6 +39,18 @@ public class initialize implements CommandLineRunner {
             userDTO.setRole(roleRepository.findByName(RoleName.ADMIN).orElseThrow());
             User user = new User(userDTO);
             userRepository.save(user);
+
+            userDTO = new UserDTO();
+            userDTO.setUsername("doctor");
+            userDTO.setPassword(passwordEncoder.encode("doctor"));
+            userDTO.setRole(roleRepository.findByName(RoleName.DOCTOR).orElseThrow());
+            userRepository.save(new User(userDTO));
+
+            userDTO = new UserDTO();
+            userDTO.setUsername("manager");
+            userDTO.setPassword(passwordEncoder.encode("manager"));
+            userDTO.setRole(roleRepository.findByName(RoleName.MANAGER).orElseThrow());
+            userRepository.save(new User(userDTO));
         }
     }
 

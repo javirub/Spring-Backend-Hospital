@@ -14,7 +14,7 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Short id;
 
     @Enumerated(EnumType.STRING)
     private RoleName name;
