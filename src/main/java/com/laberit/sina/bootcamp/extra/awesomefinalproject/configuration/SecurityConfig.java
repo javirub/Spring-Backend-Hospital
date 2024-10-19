@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
+                                .requestMatchers("/backoffice/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/backoffice/manager/**").hasRole("MANAGER")
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
