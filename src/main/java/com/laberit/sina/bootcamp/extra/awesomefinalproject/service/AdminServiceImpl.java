@@ -53,6 +53,10 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<?> modifyUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElse(null);
 
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        }
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
