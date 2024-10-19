@@ -66,8 +66,10 @@ public class AdminServiceImpl implements AdminService {
             return hasPermissions;
         }
 
-        user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        if (!userDTO.getUsername().equals("admin")) {
+            user.setUsername(userDTO.getUsername());
+        }
         user.setName(userDTO.getName());
         user.setSurnames(userDTO.getSurnames());
         roleRepository.findByName(userDTO.getRole()).ifPresent(user::setRole);
@@ -78,6 +80,9 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public ResponseEntity<String> deleteUser(Long id) {
+        if (id == 1) {
+            return ResponseEntity.badRequest().body("Admin account cannot be deleted");
+        }
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {
