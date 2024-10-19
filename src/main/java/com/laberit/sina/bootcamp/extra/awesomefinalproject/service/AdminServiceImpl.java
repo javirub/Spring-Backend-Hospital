@@ -3,6 +3,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class AdminServiceImpl implements AdminService {
             return hasPermissions;
         }
 
-        Role role = roleRepository.findByName(userDTO.getRole()).orElse(null);
+        Role role = roleRepository.findByName(RoleName.valueOf(userDTO.getRole())).orElse(null);
         if (role == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role not found");
         }
@@ -72,7 +73,7 @@ public class AdminServiceImpl implements AdminService {
         }
         user.setName(userDTO.getName());
         user.setSurnames(userDTO.getSurnames());
-        roleRepository.findByName(userDTO.getRole()).ifPresent(user::setRole);
+        roleRepository.findByName(RoleName.valueOf(userDTO.getRole())).ifPresent(user::setRole);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
