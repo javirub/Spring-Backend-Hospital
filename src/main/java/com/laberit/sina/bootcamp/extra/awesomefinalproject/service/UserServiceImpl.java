@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<String> changePassword(PasswordDTO passwordDTO, String username) {
-        if (passwordDTO.getPassword().equals(passwordDTO.getConfirmPassword())) {
+        if (!passwordDTO.getPassword().equals(passwordDTO.getConfirmPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
         }
         User user = userRepository.findByUsername(username)
