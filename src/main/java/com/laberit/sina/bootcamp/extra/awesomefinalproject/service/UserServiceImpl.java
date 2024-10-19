@@ -1,53 +1,50 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PasswordDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @Override
     @Transactional
-    public User registerUser(UserDTO userDTO) {
-        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+    public ResponseEntity<String> changePassword(PasswordDTO passwordDTO, String username) {
+        if (!passwordDTO.getPassword().equals(passwordDTO.getConfirmPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
         }
-
-
-        // Obtener el usuario autenticado
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
+        User user = userRepository.findByUsername(username)
+                .orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User: " + username + " not found");
         }
+        user.setPassword(passwordEncoder.encode(passwordDTO.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("Password changed successfully");
+    }
 
-        // Comprobar si el usuario tiene los permisos necesarios
-        boolean hasPermission = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority ->
-                        grantedAuthority.getAuthority().equals("CREATE_ADMIN") ||
-                                grantedAuthority.getAuthority().equals("CREATE_MANAGER") ||
-                                grantedAuthority.getAuthority().equals("CREATE_DOCTOR")
-                );
-
-        if (!hasPermission) {
-            throw new RuntimeException("User does not have the required permissions");
+    @Override
+    @Transactional
+    public ResponseEntity<String> deleteUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User: " + username + " not found");
         }
-        Role role = roleRepository.findByName(userDTO.getRole())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-        User newUser = new User(userDTO, role);
-        userRepository.save(newUser);
-        return newUser;
+        userRepository.delete(user);
+        return ResponseEntity.ok().build();
     }
 }
