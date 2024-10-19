@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Objects;
 
 /**
  * Controller for user account management.
@@ -34,6 +35,9 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<String> deleteUser(Principal principal) {
         String username = principal.getName();
+        if (Objects.equals(username, "admin")) {
+            return ResponseEntity.badRequest().body("Admin account cannot be deleted");
+        }
         return userService.deleteUser(username);
     }
 }
