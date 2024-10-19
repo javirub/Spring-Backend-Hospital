@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(passwordDTO.getPassword()));
         userRepository.save(user);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Password changed successfully");
     }
 
     @Override
