@@ -2,15 +2,15 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums;
 
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
 public enum RoleName {
-    ADMIN(Arrays.asList(Permissions.values())),
-    DOCTOR(List.of(Permissions.WRITE_DIAGNOSIS, Permissions.READ_DIAGNOSIS, Permissions.READ_APPOINTMENT,
-            Permissions.WRITE_APPOINTMENT, Permissions.READ_PATIENT, Permissions.WRITE_PATIENT)),
-    MANAGER(List.of(Permissions.CREATE_DOCTOR, Permissions.CREATE_MANAGER));
+    ADMIN(List.of(Permissions.REGISTER_USER, Permissions.MODIFY_USER, Permissions.DELETE_USER, Permissions.WATCH_USERS)),
+    DOCTOR(List.of(Permissions.WATCH_PATIENT_INFO, Permissions.CREATE_DIAGNOSIS, Permissions.MODIFY_DIAGNOSIS,
+            Permissions.DELETE_DIAGNOSIS, Permissions.WATCH_DIAGNOSIS, Permissions.CREATE_APPOINTMENT,
+            Permissions.MODIFY_APPOINTMENT, Permissions.DELETE_APPOINTMENT, Permissions.WATCH_PATIENT_APPOINTMENTS)),
+    MANAGER(List.of(Permissions.WATCH_PATIENT_STATISTICS, Permissions.WATCH_APPOINTMENT_STATISTICS));
 
     private final List<Permissions> permissions;
 

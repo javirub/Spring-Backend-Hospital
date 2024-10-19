@@ -6,7 +6,6 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,14 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 
 @Component
-public class initialize implements CommandLineRunner {
+public class InitializeData implements CommandLineRunner {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+
+    public InitializeData(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     @Transactional

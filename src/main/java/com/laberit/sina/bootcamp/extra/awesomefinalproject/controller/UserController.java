@@ -1,28 +1,43 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller;
 
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PasswordDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.Objects;
+
+/**
+ * Controller for user account management.
+ * Allows own users change their password, and delete their account.
+ */
 @Controller
+@RequestMapping("/user")
 public class UserController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
 
-    @PostMapping("/register")
+    @PutMapping("/change_password")
     @ResponseBody
-    public User registerPost(@RequestBody @Valid UserDTO userDTO) {
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        return userService.registerUser(userDTO);
+    public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordDTO passwordDTO, Principal principal) {
+        String username = principal.getName();
+        return userService.changePassword(passwordDTO, username);
+    }
+
+    @DeleteMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteUser(Principal principal) {
+        String username = principal.getName();
+        if (Objects.equals(username, "admin")) {
+            return ResponseEntity.badRequest().body("Admin account cannot be deleted");
+        }
+        return userService.deleteUser(username);
     }
 }

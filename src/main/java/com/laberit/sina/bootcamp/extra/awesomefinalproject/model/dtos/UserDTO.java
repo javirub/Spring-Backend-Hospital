@@ -1,6 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos;
 
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.validation.ValidRoleName;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -20,5 +20,6 @@ public class UserDTO {
     private String surnames;
 
     @NotBlank(message = "Role is mandatory")
-    private RoleName role;
+    @ValidRoleName(message = "Invalid role, valid roles are: ADMIN, MANAGER, DOCTOR")
+    private String role;
 }
