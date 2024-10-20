@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.AppointmentUtils.saveAppointmentAndReturn;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
 
 @Service
@@ -51,8 +52,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setPatient(patientRepository.findById(createAppointmentDTO.getPatientId()).get());
         appointment.setDate(createAppointmentDTO.getDate());
         appointment.setStatus(AppointmentStatus.PENDING);
-        appointmentRepository.save(appointment);
-        return ResponseEntity.ok(appointment);
+        return saveAppointmentAndReturn(appointmentRepository, appointment);
     }
 
     @Override
@@ -70,8 +70,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         // TODO: Check if the appointment is from the doctor
         Appointment appointment = appointmentRepository.findById(appointmentId).get();
         appointment.setStatus(AppointmentStatus.DONE); // TODO: ¿Change to CONFIRMED?
-        appointmentRepository.save(appointment);
-        return ResponseEntity.ok(appointment);
+        return saveAppointmentAndReturn(appointmentRepository, appointment);
     }
 
     @Override
