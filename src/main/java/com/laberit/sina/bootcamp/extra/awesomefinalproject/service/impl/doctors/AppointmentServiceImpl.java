@@ -75,6 +75,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> listPatientAppointments(Long patientId, String username) {
         ResponseEntity<?> hasPermission = checkPermissions("WATCH_PATIENT_APPOINTMENTS");
         if (hasPermission != null) {
