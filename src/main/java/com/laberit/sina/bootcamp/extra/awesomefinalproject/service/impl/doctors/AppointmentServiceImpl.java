@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
@@ -38,7 +38,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        if (createAppointmentDTO.getDate().isBefore(LocalDate.now())) {
+        if (createAppointmentDTO.getDate().isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Invalid date");
         }
 

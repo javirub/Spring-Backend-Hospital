@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class InitializeData implements CommandLineRunner {
@@ -77,6 +78,8 @@ public class InitializeData implements CommandLineRunner {
             patient.setSurnames("La Exploradora");
             patient.setBirthDate(LocalDate.of(1993, 8, 14));
             patient.setGender(Gender.FEMALE);
+            List<User> doctors = userRepository.findAllByRoleName(RoleName.DOCTOR).orElse(null);
+            patient.setDoctors(doctors);
             patientRepository.save(patient);
         }
     }
