@@ -2,6 +2,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Appointment;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.AppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.AppointmentStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.AppointmentUtils.saveAppointmentAndReturn;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
@@ -98,6 +100,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointments.isEmpty()) {
             return ResponseEntity.ok("No appointments found");
         }
-        return ResponseEntity.ok(appointments);
+
+        List<AppointmentDTO> appointmentDTOS = appointments.stream().map(appointment -> {
+            AppointmentDTO dto = new AppointmentDTO();
+            dto.setId(appointment.getId());
+            dto.setPatientId(appointment.getPatient().getId());
+            dto.setDate(appointment.getDate());
+            dto.setStatus(appointment.getStatus());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(appointmentDTOS);
     }
 }

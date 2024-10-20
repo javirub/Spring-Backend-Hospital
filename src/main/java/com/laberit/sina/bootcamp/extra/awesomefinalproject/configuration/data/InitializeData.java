@@ -46,16 +46,22 @@ public class InitializeData implements CommandLineRunner {
         if (userRepository.count() == 0) {
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername("admin");
+            userDTO.setName("Michael");
+            userDTO.setSurnames("Scott");
             userDTO.setPassword(passwordEncoder.encode("admin"));
             userRepository.save(new User(userDTO, roleRepository.findByName(RoleName.ADMIN).orElseThrow()));
 
             userDTO = new UserDTO();
             userDTO.setUsername("doctor");
+            userDTO.setName("Gregory");
+            userDTO.setSurnames("House");
             userDTO.setPassword(passwordEncoder.encode("doctor"));
             userRepository.save(new User(userDTO, roleRepository.findByName(RoleName.DOCTOR).orElseThrow()));
 
             userDTO = new UserDTO();
             userDTO.setUsername("manager");
+            userDTO.setName("Dwight");
+            userDTO.setSurnames("Schrute");
             userDTO.setPassword(passwordEncoder.encode("manager"));
             userRepository.save(new User(userDTO, roleRepository.findByName(RoleName.MANAGER).orElseThrow()));
         }
