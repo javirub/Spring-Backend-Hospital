@@ -8,6 +8,8 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Appointme
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -77,7 +79,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> listPatientAppointments(Long patientId, String username) {
+    public ResponseEntity<?> listPatientAppointments(Long patientId, String username, Pageable pageable) {
         ResponseEntity<?> hasPermission = checkPermissions("WATCH_PATIENT_APPOINTMENTS");
         if (hasPermission != null) {
             return hasPermission;
@@ -96,12 +98,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                     .body("You are not authorized to view this patient's appointments");
         }
 
-        List<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId);
+        Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
         if (appointments.isEmpty()) {
             return ResponseEntity.ok("No appointments found");
         }
 
-        List<AppointmentDTO> appointmentDTOS = appointments.stream().map(appointment -> {
+        List<AppointmentDTO> appointmentDTOS = appointments.getContent().stream().map(appointment -> {
             AppointmentDTO dto = new AppointmentDTO();
             dto.setId(appointment.getId());
             dto.setPatientId(appointment.getPatient().getId());

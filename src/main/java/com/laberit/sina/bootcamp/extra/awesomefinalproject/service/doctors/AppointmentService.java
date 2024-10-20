@@ -1,6 +1,7 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppointmentDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 public interface AppointmentService {
@@ -8,5 +9,5 @@ public interface AppointmentService {
 
     ResponseEntity<?> confirmAppointment(Long appointmentId);
 
-    ResponseEntity<?> listPatientAppointments(Long patientId, String username);
+    ResponseEntity<?> listPatientAppointments(Long patientId, String username, Pageable pageable);
 }

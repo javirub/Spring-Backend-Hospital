@@ -3,6 +3,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.doctors;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,9 @@ public class AppointmentController {
 
     @GetMapping("/list/{patientId}")
     @ResponseBody
-    public ResponseEntity<?> listPatientAppointments(@PathVariable Long patientId, Principal principal) {
+    public ResponseEntity<?> listPatientAppointments(@PathVariable Long patientId, Principal principal, Pageable pageable) {
         String username = principal.getName();
-        return appointmentService.listPatientAppointments(patientId, username);
+        return appointmentService.listPatientAppointments(patientId, username, pageable);
     }
 
     @PutMapping("/confirm/{appointmentId}")
