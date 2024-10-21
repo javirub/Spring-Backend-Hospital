@@ -7,6 +7,7 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +108,7 @@ public class AdminServiceImpl implements AdminService {
         if (hasPermissions != null) {
             return hasPermissions;
         }
-        return ResponseEntity.ok(userRepository.findAll(pageable));
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return ResponseEntity.ok(usersPage);
     }
 }

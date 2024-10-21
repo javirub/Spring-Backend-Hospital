@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.AppointmentUtils.saveAppointmentAndReturn;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
@@ -71,9 +69,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             return ResponseEntity.badRequest().body("Appointment not found");
         }
 
-        // TODO: Check if the appointment is from the doctor
         Appointment appointment = appointmentRepository.findById(appointmentId).get();
-        appointment.setStatus(AppointmentStatus.DONE); // TODO: ¿Change to CONFIRMED?
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
         return saveAppointmentAndReturn(appointmentRepository, appointment);
     }
 
@@ -103,14 +100,14 @@ public class AppointmentServiceImpl implements AppointmentService {
             return ResponseEntity.ok("No appointments found");
         }
 
-        List<AppointmentDTO> appointmentDTOS = appointments.getContent().stream().map(appointment -> {
+        Page<AppointmentDTO> appointmentDTOS = appointments.map(appointment -> {
             AppointmentDTO dto = new AppointmentDTO();
             dto.setId(appointment.getId());
             dto.setPatientId(appointment.getPatient().getId());
             dto.setDate(appointment.getDate());
             dto.setStatus(appointment.getStatus());
             return dto;
-        }).collect(Collectors.toList());
+        });
 
         return ResponseEntity.ok(appointmentDTOS);
     }
