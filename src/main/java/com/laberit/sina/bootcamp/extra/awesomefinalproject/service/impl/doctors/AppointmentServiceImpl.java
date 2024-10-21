@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.AppointmentUtils.saveAppointmentAndReturn;
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkPatientDoctorPermission;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
 @Service
@@ -77,19 +77,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public ResponseEntity<?> listPatientAppointments(Long patientId, String username, Pageable pageable) {
-        ResponseEntity<?> hasPermission = checkPermissions("WATCH_PATIENT_APPOINTMENTS");
-        if (hasPermission != null) {
-            return hasPermission;
-        }
-
         Patient patient = patientRepository.findById(patientId).orElse(null);
-        if (patient == null) {
-            return ResponseEntity.badRequest().body("Patient not found");
-        }
-
-        ResponseEntity<?> isDoctorOfPatient = checkDoctorOfPatient(patient, username);
-        if (isDoctorOfPatient != null) {
-            return isDoctorOfPatient;
+        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, patient, username, "WATCH_APPOINTMENTS");
+        if (check != null) {
+            return check;
         }
 
         Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
