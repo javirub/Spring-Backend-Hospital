@@ -1,5 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,10 +25,12 @@ public class Patient {
 
     private Gender gender;
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Diagnosis> diagnosis;
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Appointment> appointments;
 
     @ManyToMany

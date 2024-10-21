@@ -65,7 +65,7 @@ public class AdminServiceImpl implements AdminService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        ResponseEntity<?> hasPermissions = checkPermissions("MODIFY_USER");
+        ResponseEntity<?> hasPermissions = checkPermissions("UPDATE_USER");
         if (hasPermissions != null) {
             return hasPermissions;
         }

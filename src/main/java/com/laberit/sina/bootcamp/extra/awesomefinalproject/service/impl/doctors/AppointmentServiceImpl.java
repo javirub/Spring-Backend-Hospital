@@ -76,9 +76,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> listPatientAppointments(Long patientId, String username, Pageable pageable) {
+    public ResponseEntity<?> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable) {
         Patient patient = patientRepository.findById(patientId).orElse(null);
-        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, patient, username, "WATCH_APPOINTMENTS");
+        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, patient, doctorsUsername,
+                "WATCH_PATIENT_APPOINTMENTS");
         if (check != null) {
             return check;
         }

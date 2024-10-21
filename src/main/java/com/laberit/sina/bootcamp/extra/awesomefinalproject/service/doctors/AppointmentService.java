@@ -9,5 +9,5 @@ public interface AppointmentService {
 
     ResponseEntity<?> confirmAppointment(Long appointmentId);
 
-    ResponseEntity<?> listPatientAppointments(Long patientId, String username, Pageable pageable);
+    ResponseEntity<?> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable);
 }

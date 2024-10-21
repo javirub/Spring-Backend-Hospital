@@ -28,8 +28,8 @@ public class AppointmentController {
     @GetMapping("/list/{patientId}")
     @ResponseBody
     public ResponseEntity<?> listPatientAppointments(@PathVariable Long patientId, Principal principal, Pageable pageable) {
-        String username = principal.getName();
-        return appointmentService.listPatientAppointments(patientId, username, pageable);
+        String doctorsUsername = principal.getName();
+        return appointmentService.listPatientAppointments(patientId, doctorsUsername, pageable);
     }
 
     @PutMapping("/confirm/{appointmentId}")
