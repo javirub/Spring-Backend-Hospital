@@ -21,18 +21,21 @@ public class DiagnosisController {
     }
 
     @PostMapping("/create")
+    @ResponseBody
     public ResponseEntity<?> createDiagnosis(@RequestBody @Valid CreateDiagnosisDTO createDiagnosisDTO, Principal principal) {
         String doctorsUsername = principal.getName();
         return diagnosisService.createDiagnosis(createDiagnosisDTO, doctorsUsername);
     }
 
     @GetMapping("/list/{patientId}")
+    @ResponseBody
     public ResponseEntity<?> listDiagnosis(@PathVariable Long patientId, Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         return diagnosisService.listDiagnosis(patientId, doctorsUsername, pageable);
     }
 
     @PutMapping("/update/{diagnosisId}")
+    @ResponseBody
     public ResponseEntity<?> updateDiagnosis(@PathVariable Long diagnosisId, @RequestParam DiagnosisStatus diagnosisStatus, Principal principal) {
         String doctorsUsername = principal.getName();
         return diagnosisService.updateDiagnosis(diagnosisId, diagnosisStatus, doctorsUsername);

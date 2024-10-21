@@ -33,7 +33,7 @@ public class Patient {
     @JsonManagedReference
     private List<Appointment> appointments;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "patient_doctor",
             joinColumns = @JoinColumn(name = "patient_id"),
