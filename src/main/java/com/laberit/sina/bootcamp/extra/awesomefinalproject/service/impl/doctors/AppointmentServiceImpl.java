@@ -10,15 +10,15 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRep
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.AppointmentUtils.saveAppointmentAndReturn;
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.AppointmentUtils.saveAppointmentAndReturn;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
@@ -87,12 +87,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        boolean isDoctorOfPatient = patient.getDoctors().stream()
-                .anyMatch(doctor -> doctor.getUsername().equals(username));
-
-        if (!isDoctorOfPatient) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to view this patient's appointments");
+        ResponseEntity<?> isDoctorOfPatient = checkDoctorOfPatient(patient, username);
+        if (isDoctorOfPatient != null) {
+            return isDoctorOfPatient;
         }
 
         Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
@@ -100,14 +97,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             return ResponseEntity.ok("No appointments found");
         }
 
-        Page<AppointmentDTO> appointmentDTOS = appointments.map(appointment -> {
-            AppointmentDTO dto = new AppointmentDTO();
-            dto.setId(appointment.getId());
-            dto.setPatientId(appointment.getPatient().getId());
-            dto.setDate(appointment.getDate());
-            dto.setStatus(appointment.getStatus());
-            return dto;
-        });
+        Page<AppointmentDTO> appointmentDTOS = appointments.map(AppointmentDTO::new);
 
         return ResponseEntity.ok(appointmentDTOS);
     }

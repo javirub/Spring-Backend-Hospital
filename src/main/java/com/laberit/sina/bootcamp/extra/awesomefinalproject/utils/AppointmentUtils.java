@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.utils;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Appointment;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.AppointmentDTO;
@@ -6,15 +6,17 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.Appointmen
 import org.springframework.http.ResponseEntity;
 
 public class AppointmentUtils {
-
+    /**
+     * Save appointment and return it as a response entity
+     *
+     * @param appointmentRepository
+     * @param appointment
+     * @return ResponseEntity<?>
+     */
     public static ResponseEntity<?> saveAppointmentAndReturn(AppointmentRepository appointmentRepository, Appointment appointment) {
         appointmentRepository.save(appointment);
 
-        AppointmentDTO appointmentDTO = new AppointmentDTO();
-        appointmentDTO.setId(appointment.getId());
-        appointmentDTO.setPatientId(appointment.getPatient().getId());
-        appointmentDTO.setDate(appointment.getDate());
-        appointmentDTO.setStatus(appointment.getStatus());
+        AppointmentDTO appointmentDTO = new AppointmentDTO(appointment);
 
         return ResponseEntity.ok(appointmentDTO);
     }
