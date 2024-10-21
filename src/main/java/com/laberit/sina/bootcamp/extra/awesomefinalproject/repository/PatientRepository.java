@@ -11,10 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     Page<Patient> findByDoctorsContaining(User doctor, Pageable pageable);
 
-    @Query("SELECT AVG(YEAR(CURRENT_DATE) - YEAR(p.birthDate) - " +
-            "CASE WHEN MONTH(CURRENT_DATE) < MONTH(p.birthDate) OR " +
-            "(MONTH(CURRENT_DATE) = MONTH(p.birthDate) AND DAY(CURRENT_DATE) < DAY(p.birthDate)) " +
-            "THEN 1 ELSE 0 END) FROM Patient p")
+    @Query(value = "SELECT AVG(EXTRACT(YEAR FROM AGE(p.birth_date))) FROM patient p", nativeQuery = true)
     double getMeanAge();
 
     int countPatientByGender(Gender gender);
