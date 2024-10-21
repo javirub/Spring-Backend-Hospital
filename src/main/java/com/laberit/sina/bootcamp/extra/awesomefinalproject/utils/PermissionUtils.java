@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +7,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Arrays;
 
+/**
+ * Utility class for checking user permissions
+ * Usage: checkPermissions("PERMISSION1", "PERMISSION2", ...)
+ * Returns null if the user has all the required permissions, otherwise returns a ResponseEntity with the appropriate
+ * status code and message.
+ */
 public class PermissionUtils {
     public static ResponseEntity<?> checkPermissions(String... requiredPermissions) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

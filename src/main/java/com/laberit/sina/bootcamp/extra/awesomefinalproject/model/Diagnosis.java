@@ -1,5 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.DiagnosisStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Disease;
 import jakarta.persistence.*;
@@ -17,7 +18,9 @@ public class Diagnosis {
     @Enumerated(EnumType.STRING)
     private Disease disease;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id")
+    @JsonBackReference
     private Patient patient;
 
     @Enumerated(EnumType.STRING)
