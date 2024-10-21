@@ -54,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> modifyUser(Long id, UserDTO userDTO) {
+    public ResponseEntity<?> updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElse(null);
 
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 public interface AdminService {
     ResponseEntity<?> registerUser(UserDTO userDTO);
 
-    ResponseEntity<?> modifyUser(Long id, UserDTO userDTO);
+    ResponseEntity<?> updateUser(Long id, UserDTO userDTO);
 
     ResponseEntity<String> deleteUser(Long id);
 

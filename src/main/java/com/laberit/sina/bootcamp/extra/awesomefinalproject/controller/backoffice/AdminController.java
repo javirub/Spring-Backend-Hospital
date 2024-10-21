@@ -29,10 +29,10 @@ public class AdminController {
         return adminService.registerUser(userDTO);
     }
 
-    @PutMapping("/modify/{id}")
+    @PutMapping("/update/{id}")
     @ResponseBody
-    public ResponseEntity<?> modifyUser(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return adminService.modifyUser(id, userDTO);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
+        return adminService.updateUser(id, userDTO);
     }
 
     @DeleteMapping("/delete/{id}")
