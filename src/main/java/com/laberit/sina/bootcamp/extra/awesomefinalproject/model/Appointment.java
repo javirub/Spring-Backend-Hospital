@@ -18,6 +18,7 @@ public class Appointment {
     @ManyToOne
     private Patient patient;
 
+    @Column(columnDefinition = "TIMESTAMP(0)")
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
