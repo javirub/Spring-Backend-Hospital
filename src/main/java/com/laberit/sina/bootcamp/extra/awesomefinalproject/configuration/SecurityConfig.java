@@ -1,6 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.configuration;
 
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.CustomUserDetailService;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -3,6 +3,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffic
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,10 @@ public class AdminController {
         return adminService.registerUser(userDTO);
     }
 
-    @PutMapping("/modify/{id}")
+    @PutMapping("/update/{id}")
     @ResponseBody
-    public ResponseEntity<?> modifyUser(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return adminService.modifyUser(id, userDTO);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
+        return adminService.updateUser(id, userDTO);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -42,7 +43,7 @@ public class AdminController {
 
     @GetMapping("/list")
     @ResponseBody
-    public ResponseEntity<?> listUsers() {
-        return adminService.listUsers();
+    public ResponseEntity<?> listUsers(Pageable pageable) {
+        return adminService.listUsers(pageable);
     }
 }

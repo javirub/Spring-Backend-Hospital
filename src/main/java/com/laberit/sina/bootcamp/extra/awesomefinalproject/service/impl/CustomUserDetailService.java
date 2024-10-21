@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;

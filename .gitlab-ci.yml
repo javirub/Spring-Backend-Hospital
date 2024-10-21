@@ -26,16 +26,6 @@ build:
   only:
     - dev
 
-tests:
-  stage: tests
-  script:
-    - echo "This will run tests before deploying"
-    - echo "PD:First we need to write tests"
-  tags:
-    - bootcamp
-  only:
-    - dev
-
 deploy:
   stage: deploy
   image: docker:latest

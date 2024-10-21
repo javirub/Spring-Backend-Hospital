@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
@@ -6,13 +6,16 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.service.utils.PermissionUtils.checkPermissions;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -51,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> modifyUser(Long id, UserDTO userDTO) {
+    public ResponseEntity<?> updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElse(null);
 
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
@@ -62,7 +65,7 @@ public class AdminServiceImpl implements AdminService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        ResponseEntity<?> hasPermissions = checkPermissions("MODIFY_USER");
+        ResponseEntity<?> hasPermissions = checkPermissions("UPDATE_USER");
         if (hasPermissions != null) {
             return hasPermissions;
         }
@@ -100,11 +103,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ResponseEntity<?> listUsers() {
+    public ResponseEntity<?> listUsers(Pageable pageable) {
         ResponseEntity<?> hasPermissions = checkPermissions("WATCH_USERS");
         if (hasPermissions != null) {
             return hasPermissions;
         }
-        return ResponseEntity.ok(userRepository.findAll());
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return ResponseEntity.ok(usersPage);
     }
 }
