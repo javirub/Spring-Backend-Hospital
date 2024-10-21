@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.user;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PasswordDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.UserService;
