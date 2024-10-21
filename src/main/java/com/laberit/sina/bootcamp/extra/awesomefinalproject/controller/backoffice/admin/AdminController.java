@@ -1,4 +1,4 @@
-package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffice;
+package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffice.admin;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;

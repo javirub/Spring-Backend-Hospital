@@ -12,10 +12,10 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/doctors/appointment")
-public class AppointmentController {
+public class DoctorAppointmentController {
     private final AppointmentService appointmentService;
 
-    public AppointmentController(AppointmentService appointmentService) {
+    public DoctorAppointmentController(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
 

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.laberit.sina.bootcamp.extra</groupId>
 	<artifactId>awesome-final-project</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-beta</version>
 	<name>awesome-final-project</name>
 	<description>awesome-final-project</description>
 	<url/>
