@@ -73,8 +73,7 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
         List<Map<String, Object>> content = results.stream()
                 .map(result -> Map.of(
                         "doctorId", result[0],
-                        "name", result[1],
-                        "surnames", result[2],
+                        "completeName", result[1] + " " + result[2],
                         "cancelledCount", result[3]
                 )).collect(Collectors.toList());
 

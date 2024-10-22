@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Utility class for checking user permissions
  * Usage: checkPermissions("PERMISSION1", "PERMISSION2", ...)
- * Returns null if the user has all the required permissions, otherwise returns a ResponseEntity with the appropriate
+ * If the user does not have all the required permissions, it throws an exception with the appropriate
  * status code and message.
  */
 public class PermissionUtils {
