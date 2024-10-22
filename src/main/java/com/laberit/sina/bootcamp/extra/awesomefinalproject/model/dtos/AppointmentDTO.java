@@ -13,6 +13,7 @@ public class AppointmentDTO {
     private LocalDateTime date;
     private AppointmentStatus status;
     private Long doctorId;
+    private String doctorName;
 
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
@@ -20,5 +21,6 @@ public class AppointmentDTO {
         this.date = appointment.getDate();
         this.status = appointment.getStatus();
         this.doctorId = appointment.getDoctor().getId();
+        this.doctorName = appointment.getDoctor().getName() + " " + appointment.getDoctor().getSurnames();
     }
 }
