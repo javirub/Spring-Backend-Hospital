@@ -74,13 +74,11 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
             return ResponseEntity.noContent().build();
         }
 
-        List<Map<String, Object>> doctorCounts = results.stream()
-                .map(result -> Map.of(
-                        "UserID", result[0],
-                        "fullName", result[1] + " " + result[2],
-                        "cancelledCount", result[3]
-                ))
-                .collect(Collectors.toList());
+        Page<Map<String, Object>> doctorCounts = results.map(result -> Map.of(
+                "UserID", result[0],
+                "fullName", result[1] + " " + result[2],
+                "cancelledCount", result[3]
+        ));
 
         return ResponseEntity.ok().body(doctorCounts);
     }
