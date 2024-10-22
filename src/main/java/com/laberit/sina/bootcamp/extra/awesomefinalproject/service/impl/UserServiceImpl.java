@@ -4,11 +4,12 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PasswordDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,29 +24,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> changePassword(PasswordDTO passwordDTO, String username) {
+    public Map<String, String> changePassword(PasswordDTO passwordDTO, String username) {
         if (!passwordDTO.getPassword().equals(passwordDTO.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
+            throw new IllegalArgumentException("Passwords do not match");
         }
-        User user = userRepository.findByUsername(username)
-                .orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User: " + username + " not found");
-        }
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new IllegalArgumentException("User not found"));
+
         user.setPassword(passwordEncoder.encode(passwordDTO.getPassword()));
+
         userRepository.save(user);
-        return ResponseEntity.ok("Password changed successfully");
+
+        return Map.of("Status", "Password changed successfully");
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> deleteUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User: " + username + " not found");
+    public Map<String, String> deleteUser(String username) {
+        if (Objects.equals(username, "admin")) {
+            throw new IllegalArgumentException("Admin account cannot be deleted");
         }
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new IllegalArgumentException("User not found"));
         userRepository.delete(user);
-        return ResponseEntity.ok().build();
+        return Map.of("Status", "User deleted successfully");
     }
 }

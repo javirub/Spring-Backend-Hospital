@@ -56,9 +56,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         diagnosis.setDisease(Disease.valueOf(createDiagnosisDTO.getDisease()));
         diagnosis.setStatus(DiagnosisStatus.PENDING);
 
-        diagnosisRepository.save(diagnosis);
-
-        return diagnosis;
+        return diagnosisRepository.save(diagnosis);
     }
 
     @Override
@@ -97,7 +95,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         checkDoctorOfPatient(patient, doctor, "Update Diagnosis", unauthorizedAccessRepository);
 
         diagnosis.setStatus(diagnosisStatus);
-        diagnosisRepository.save(diagnosis);
-        return diagnosis;
+
+        return diagnosisRepository.save(diagnosis);
     }
 }
