@@ -1,9 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,8 +14,14 @@ public class UnauthorizedAccess {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long patientId;
-    private String doctorUsername;
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User doctor;
+
     private LocalDateTime timestamp;
     private String query; // Nuevo campo para almacenar la consulta
 }

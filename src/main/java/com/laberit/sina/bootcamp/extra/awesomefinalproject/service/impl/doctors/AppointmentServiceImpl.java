@@ -101,7 +101,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             return hasPermission;
         }
 
-        checkDoctorOfPatient(patient, doctorsUsername, "Watch Patient Appointments", unauthorizedAccessRepository);
+        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
+        if (doctor == null) {
+            return ResponseEntity.badRequest().body("Doctor not found");
+        }
+
+        checkDoctorOfPatient(patient, doctor, "Watch Patient Appointments", unauthorizedAccessRepository);
         Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
         if (appointments.isEmpty()) {
             return ResponseEntity.ok("No appointments found");

@@ -2,6 +2,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Diagnosis;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateDiagnosisDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.DiagnosisDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.DiagnosisStatus;
@@ -9,6 +10,7 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Disease;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.DiagnosisRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.DiagnosisService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +25,14 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     private final PatientRepository patientRepository;
     private final DiagnosisRepository diagnosisRepository;
     private final UnauthorizedAccessRepository unauthorizedAccessRepository;
+    private final UserRepository userRepository;
 
     public DiagnosisServiceImpl(PatientRepository patientRepository, DiagnosisRepository diagnosisRepository,
-                                UnauthorizedAccessRepository unauthorizedAccessRepository) {
+                                UnauthorizedAccessRepository unauthorizedAccessRepository, UserRepository userRepository) {
         this.patientRepository = patientRepository;
         this.diagnosisRepository = diagnosisRepository;
         this.unauthorizedAccessRepository = unauthorizedAccessRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -44,7 +48,12 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        checkDoctorOfPatient(patient, doctorsUsername, "Create Diagnosis", unauthorizedAccessRepository);
+        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
+        if (doctor == null){
+            return ResponseEntity.badRequest().body("Doctor not found");
+        }
+
+        checkDoctorOfPatient(patient, doctor, "Create Diagnosis", unauthorizedAccessRepository);
 
 
         Diagnosis diagnosis = new Diagnosis();
@@ -72,7 +81,12 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        checkDoctorOfPatient(patient, doctorsUsername, "List Diagnosis", unauthorizedAccessRepository);
+        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
+        if (doctor == null){
+            return ResponseEntity.badRequest().body("Doctor not found");
+        }
+
+        checkDoctorOfPatient(patient, doctor, "List Diagnosis", unauthorizedAccessRepository);
 
         return ResponseEntity.ok(diagnosisRepository.findAllByPatient(patient, pageable).map(DiagnosisDTO::new));
     }
@@ -97,7 +111,12 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        checkDoctorOfPatient(patient, doctorsUsername, "Update Diagnosis", unauthorizedAccessRepository);
+        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
+        if (doctor == null){
+            return ResponseEntity.badRequest().body("Doctor not found");
+        }
+
+        checkDoctorOfPatient(patient, doctor, "Update Diagnosis", unauthorizedAccessRepository);
 
         diagnosis.setStatus(diagnosisStatus);
         diagnosisRepository.save(diagnosis);

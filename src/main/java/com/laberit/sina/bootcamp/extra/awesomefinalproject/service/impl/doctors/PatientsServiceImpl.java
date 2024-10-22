@@ -64,8 +64,8 @@ public class PatientsServiceImpl implements PatientsService {
 
         if (!patient.getDoctors().contains(doctor)) {
             UnauthorizedAccess unauthorizedAccess = new UnauthorizedAccess();
-            unauthorizedAccess.setPatientId(patientId);
-            unauthorizedAccess.setDoctorUsername(doctorsUsername);
+            unauthorizedAccess.setPatient(patient);
+            unauthorizedAccess.setDoctor(doctor);
             unauthorizedAccess.setTimestamp(java.time.LocalDateTime.now());
             unauthorizedAccess.setQuery("Get Patient Details");
             unauthorizedAccessRepository.save(unauthorizedAccess);
