@@ -1,10 +1,11 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 public interface PatientsService {
-    ResponseEntity<?> listMyPatients(String doctorsUsername, Pageable pageable);
+    Page<Patient> listMyPatients(String doctorsUsername, Pageable pageable);
 
-    ResponseEntity<?> getPatientDetails(Long patientId, String doctorsUsername);
+    Patient getPatientDetails(Long patientId, String doctorsUsername);
 }

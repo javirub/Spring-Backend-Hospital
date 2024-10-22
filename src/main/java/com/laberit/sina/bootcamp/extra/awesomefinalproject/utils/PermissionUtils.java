@@ -1,7 +1,7 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.utils;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.ForbiddenAccessException;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.UnauthorizedAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -14,19 +14,17 @@ import java.util.Arrays;
  * status code and message.
  */
 public class PermissionUtils {
-    public static ResponseEntity<?> checkPermissions(String... requiredPermissions) {
+    public static void checkPermissions(String... requiredPermissions) throws UnauthorizedAccessException, ForbiddenAccessException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            throw new UnauthorizedAccessException("User is not authenticated");
         }
-
         boolean hasAllPermissions = Arrays.stream(requiredPermissions)
                 .allMatch(requiredPermission -> authentication.getAuthorities().stream()
                         .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(requiredPermission)));
 
         if (!hasAllPermissions) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User does not have the required permissions");
+            throw new ForbiddenAccessException("User does not have the required permissions");
         }
-        return null;
     }
 }
