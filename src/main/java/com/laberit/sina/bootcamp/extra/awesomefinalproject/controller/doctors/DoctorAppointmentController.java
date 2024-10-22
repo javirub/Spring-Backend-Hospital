@@ -21,8 +21,10 @@ public class DoctorAppointmentController {
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<?> createAppointment(@RequestBody @Valid CreateAppointmentDTO createAppointmentDTO) {
-        return appointmentService.createAppointment(createAppointmentDTO);
+    public ResponseEntity<?> createAppointment(@RequestBody @Valid CreateAppointmentDTO createAppointmentDTO,
+                                               Principal principal) {
+        String doctorsUsername = principal.getName();
+        return appointmentService.createAppointment(createAppointmentDTO, doctorsUsername);
     }
 
     @GetMapping("/list/{patientId}")

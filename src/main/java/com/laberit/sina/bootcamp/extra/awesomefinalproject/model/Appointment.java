@@ -26,4 +26,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User doctor;
 }

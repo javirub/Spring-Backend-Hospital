@@ -12,11 +12,13 @@ public class AppointmentDTO {
     private Long patientId;
     private LocalDateTime date;
     private AppointmentStatus status;
+    private Long doctorId;
 
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
         this.patientId = appointment.getPatient().getId();
         this.date = appointment.getDate();
         this.status = appointment.getStatus();
+        this.doctorId = appointment.getDoctor().getId();
     }
 }

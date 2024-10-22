@@ -2,11 +2,13 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Appointment;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.AppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.AppointmentStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +26,18 @@ import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.Permissi
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
+    private final UserRepository userRepository;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, PatientRepository patientRepository) {
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, PatientRepository patientRepository,
+                                  UserRepository userRepository) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> createAppointment(CreateAppointmentDTO createAppointmentDTO) {
+    public ResponseEntity<?> createAppointment(CreateAppointmentDTO createAppointmentDTO, String doctorsUsername) {
         if (createAppointmentDTO == null) {
             return ResponseEntity.badRequest().body("You must provide a valid appointment");
         }
@@ -50,10 +55,16 @@ public class AppointmentServiceImpl implements AppointmentService {
             return hasPermission;
         }
 
+        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
+        if (doctor == null) {
+            return ResponseEntity.badRequest().body("Doctor not found");
+        }
+
         Appointment appointment = new Appointment();
         appointment.setPatient(patientRepository.findById(createAppointmentDTO.getPatientId()).get());
         appointment.setDate(createAppointmentDTO.getDate());
         appointment.setStatus(AppointmentStatus.PENDING);
+        appointment.setDoctor(doctor);
         return saveAppointmentAndReturn(appointmentRepository, appointment);
     }
 
