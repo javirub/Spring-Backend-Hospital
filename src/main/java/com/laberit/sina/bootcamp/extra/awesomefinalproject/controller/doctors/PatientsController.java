@@ -1,6 +1,7 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.doctors;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PatientDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.PatientsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,15 +24,16 @@ public class PatientsController {
 
     @GetMapping("/list")
     @ResponseBody
-    public Page<Patient> listMyPatients(Principal principal, Pageable pageable) {
+    public Page<PatientDTO> listMyPatients(Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
-        return patientsService.listMyPatients(doctorsUsername, pageable);
+        Page<Patient> patients = patientsService.listMyPatients(doctorsUsername, pageable);
+        return patients.map(PatientDTO::new);
     }
 
     @GetMapping("/list/{patientId}")
     @ResponseBody
-    public Patient getPatientDetails(@PathVariable Long patientId, Principal principal) {
+    public PatientDTO getPatientDetails(@PathVariable Long patientId, Principal principal) {
         String doctorsUsername = principal.getName();
-        return patientsService.getPatientDetails(patientId, doctorsUsername);
+        return new PatientDTO(patientsService.getPatientDetails(patientId, doctorsUsername));
     }
 }
