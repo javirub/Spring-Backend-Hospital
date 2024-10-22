@@ -7,12 +7,11 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.Diagn
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@Controller
+@RestController
 @RequestMapping("/doctors/diagnosis")
 public class DiagnosisController {
     private final DiagnosisService diagnosisService;
@@ -22,21 +21,18 @@ public class DiagnosisController {
     }
 
     @PostMapping("/create")
-    @ResponseBody
     public Diagnosis createDiagnosis(@RequestBody @Valid CreateDiagnosisDTO createDiagnosisDTO, Principal principal) {
         String doctorsUsername = principal.getName();
         return diagnosisService.createDiagnosis(createDiagnosisDTO, doctorsUsername);
     }
 
     @GetMapping("/list/{patientId}")
-    @ResponseBody
     public Page<Diagnosis> listDiagnosis(@PathVariable Long patientId, Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         return diagnosisService.listDiagnosis(patientId, doctorsUsername, pageable);
     }
 
     @PutMapping("/update/{diagnosisId}")
-    @ResponseBody
     public Diagnosis updateDiagnosis(@PathVariable Long diagnosisId,
                                      @RequestParam DiagnosisStatus diagnosisStatus, Principal principal) {
         String doctorsUsername = principal.getName();

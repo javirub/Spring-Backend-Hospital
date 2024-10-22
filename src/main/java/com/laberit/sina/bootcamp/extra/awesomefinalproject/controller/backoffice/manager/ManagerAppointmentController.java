@@ -3,14 +3,14 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffic
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.ManagerAppointmentService;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 
-@Controller
+@RestController
 @RequestMapping("/backoffice/manager")
 public class ManagerAppointmentController {
     private final ManagerAppointmentService managerAppointmentService;

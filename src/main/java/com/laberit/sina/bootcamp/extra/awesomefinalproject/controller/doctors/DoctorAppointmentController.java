@@ -7,12 +7,11 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.Appoi
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@Controller
+@RestController
 @RequestMapping("/doctors/appointment")
 public class DoctorAppointmentController {
     private final AppointmentService appointmentService;
@@ -22,7 +21,6 @@ public class DoctorAppointmentController {
     }
 
     @PostMapping("/create")
-    @ResponseBody
     public AppointmentDTO createAppointment(@RequestBody @Valid CreateAppointmentDTO createAppointmentDTO,
                                             Principal principal) {
         String doctorsUsername = principal.getName();
@@ -30,7 +28,6 @@ public class DoctorAppointmentController {
     }
 
     @GetMapping("/list/{patientId}")
-    @ResponseBody
     public Page<AppointmentDTO> listPatientAppointments(@PathVariable Long patientId, Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         Page<Appointment> appointments = appointmentService.listPatientAppointments(patientId, doctorsUsername, pageable);
@@ -38,7 +35,6 @@ public class DoctorAppointmentController {
     }
 
     @PutMapping("/confirm/{appointmentId}")
-    @ResponseBody
     public AppointmentDTO confirmAppointment(@PathVariable Long appointmentId) {
         return new AppointmentDTO(appointmentService.confirmAppointment(appointmentId));
     }

@@ -5,15 +5,14 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PatientDTO
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.PatientsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-@Controller
+@RestController
 @RequestMapping("/doctors/patients")
 public class PatientsController {
     private final PatientsService patientsService;
@@ -23,7 +22,6 @@ public class PatientsController {
     }
 
     @GetMapping("/list")
-    @ResponseBody
     public Page<PatientDTO> listMyPatients(Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         Page<Patient> patients = patientsService.listMyPatients(doctorsUsername, pageable);
@@ -31,7 +29,6 @@ public class PatientsController {
     }
 
     @GetMapping("/list/{patientId}")
-    @ResponseBody
     public PatientDTO getPatientDetails(@PathVariable Long patientId, Principal principal) {
         String doctorsUsername = principal.getName();
         return new PatientDTO(patientsService.getPatientDetails(patientId, doctorsUsername));
