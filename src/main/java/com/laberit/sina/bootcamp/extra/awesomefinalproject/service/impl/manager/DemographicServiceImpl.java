@@ -38,7 +38,7 @@ public class DemographicServiceImpl implements DemographicService {
 
         double meanAge = patientRepository.getMeanAge();
 
-        return ResponseEntity.ok().body(meanAge);
+        return ResponseEntity.ok().body(Map.of("meanAge", meanAge));
     }
 
     @Override
