@@ -3,6 +3,8 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.manager
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.AppointmentStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.ManagerAppointmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,12 +65,23 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
 
     @Override
     @Transactional
-    public ResponseEntity<?> cancelledAppointmentsByDoctor() {
+    public ResponseEntity<?> cancelledAppointmentsByDoctor(Pageable pageable) {
         ResponseEntity<?> hasPermission = checkPermissions("WATCH_APPOINTMENT_STATISTICS");
         if (hasPermission != null) return hasPermission;
 
-        // TODO: Does an appointment have a doctor?
+        Page<Object[]> results = appointmentRepository.countCancelledAppointmentsByDoctor(pageable);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
 
-        return null;
+        List<Map<String, Object>> doctorCounts = results.stream()
+                .map(result -> Map.of(
+                        "UserID", result[0],
+                        "fullName", result[1] + " " + result[2],
+                        "cancelledCount", result[3]
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(doctorCounts);
     }
 }

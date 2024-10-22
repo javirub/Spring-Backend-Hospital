@@ -19,4 +19,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             "WHERE a.status = 'CANCELLED' " +
             "GROUP BY age", nativeQuery = true)
     List<Object[]> countCancelledAppointmentsByAge();
+
+    @Query("SELECT d.id AS doctorId, d.name, d.surnames, COUNT(a) AS appointmentCount " +
+            "FROM Appointment a JOIN a.doctor d " +
+            "WHERE a.status = 'CANCELLED' " +
+            "GROUP BY d.id " +
+            "ORDER BY appointmentCount DESC")
+    Page<Object[]> countCancelledAppointmentsByDoctor(Pageable pageable);
 }
