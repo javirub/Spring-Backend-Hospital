@@ -1,10 +1,11 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.PasswordDTO;
-import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 public interface UserService {
-    ResponseEntity<String> changePassword(PasswordDTO passwordDTO, String username);
+    Map<String, String> changePassword(PasswordDTO passwordDTO, String username);
 
-    ResponseEntity<String> deleteUser(String username);
+    Map<String, String> deleteUser(String username);
 }

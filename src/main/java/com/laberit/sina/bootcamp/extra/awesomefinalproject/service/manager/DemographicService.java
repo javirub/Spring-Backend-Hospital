@@ -1,11 +1,11 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager;
 
-import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 public interface DemographicService {
-    ResponseEntity<?> patientsByGender();
+    Map<String, Integer> patientsByGender();
 
-    ResponseEntity<?> patientsByAge();
+    Map<String, Double> patientsMeanAge();
 
-    ResponseEntity<?> patientsWithDiagnosis();
+    Map<String, Long> patientsWithDiagnosis();
 }

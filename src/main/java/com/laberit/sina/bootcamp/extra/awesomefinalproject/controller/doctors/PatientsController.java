@@ -1,8 +1,9 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.doctors;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.PatientsService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,14 +23,14 @@ public class PatientsController {
 
     @GetMapping("/list")
     @ResponseBody
-    public ResponseEntity<?> listMyPatients(Principal principal, Pageable pageable) {
+    public Page<Patient> listMyPatients(Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         return patientsService.listMyPatients(doctorsUsername, pageable);
     }
 
     @GetMapping("/list/{patientId}")
     @ResponseBody
-    public ResponseEntity<?> getPatientDetails(@PathVariable Long patientId, Principal principal) {
+    public Patient getPatientDetails(@PathVariable Long patientId, Principal principal) {
         String doctorsUsername = principal.getName();
         return patientsService.getPatientDetails(patientId, doctorsUsername);
     }

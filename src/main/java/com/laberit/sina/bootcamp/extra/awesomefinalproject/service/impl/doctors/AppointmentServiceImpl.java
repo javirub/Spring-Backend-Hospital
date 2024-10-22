@@ -1,9 +1,9 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.NoContentException;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Appointment;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.AppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppointmentDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.AppointmentStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
@@ -13,13 +13,11 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserReposi
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.AppointmentUtils.saveAppointmentAndReturn;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
@@ -40,80 +38,63 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> createAppointment(CreateAppointmentDTO createAppointmentDTO, String doctorsUsername) {
-        if (createAppointmentDTO == null) {
-            return ResponseEntity.badRequest().body("You must provide a valid appointment");
-        }
-
-        if (patientRepository.findById(createAppointmentDTO.getPatientId()).isEmpty()) {
-            return ResponseEntity.badRequest().body("Patient not found");
-        }
+    public Appointment createAppointment(CreateAppointmentDTO createAppointmentDTO, String doctorsUsername) {
+        checkPermissions("CREATE_APPOINTMENT");
 
         if (createAppointmentDTO.getDate().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body("Invalid date");
+            throw new IllegalArgumentException("Date cannot be in the past");
         }
 
-        ResponseEntity<?> hasPermission = checkPermissions("CREATE_APPOINTMENT");
-        if (hasPermission != null) {
-            return hasPermission;
-        }
+        User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
+                new RuntimeException("Doctor not found"));
 
-        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
-        if (doctor == null) {
-            return ResponseEntity.badRequest().body("Doctor not found");
-        }
+        Patient patient = patientRepository.findById(createAppointmentDTO.getPatientId()).orElseThrow(() ->
+                new IllegalArgumentException("Patient not found"));
+
+        checkDoctorOfPatient(patient, doctor, "Create Appointment", unauthorizedAccessRepository);
 
         Appointment appointment = new Appointment();
-        appointment.setPatient(patientRepository.findById(createAppointmentDTO.getPatientId()).get());
+        appointment.setPatient(patient);
         appointment.setDate(createAppointmentDTO.getDate());
         appointment.setStatus(AppointmentStatus.PENDING);
         appointment.setDoctor(doctor);
-        return saveAppointmentAndReturn(appointmentRepository, appointment);
+
+        return appointmentRepository.save(appointment);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> confirmAppointment(Long appointmentId) {
-        ResponseEntity<?> hasPermission = checkPermissions("CONFIRM_APPOINTMENT");
-        if (hasPermission != null) {
-            return hasPermission;
-        }
+    public Appointment confirmAppointment(Long appointmentId) {
+        checkPermissions("CONFIRM_APPOINTMENT");
 
-        if (appointmentRepository.findById(appointmentId).isEmpty()) {
-            return ResponseEntity.badRequest().body("Appointment not found");
-        }
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() ->
+                new IllegalArgumentException("Appointment not found"));
 
-        Appointment appointment = appointmentRepository.findById(appointmentId).get();
+
+        checkDoctorOfPatient(appointment.getPatient(), appointment.getDoctor(),
+                "Confirm Appointment", unauthorizedAccessRepository);
+
         appointment.setStatus(AppointmentStatus.CONFIRMED);
-        return saveAppointmentAndReturn(appointmentRepository, appointment);
+        return appointmentRepository.save(appointment);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable) {
-        Patient patient = patientRepository.findById(patientId).orElse(null);
-        if (patient == null) {
-            return ResponseEntity.badRequest().body("Patient not found");
-        }
+    public Page<Appointment> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable) {
+        checkPermissions("WATCH_PATIENT_APPOINTMENTS");
+        Patient patient = patientRepository.findById(patientId).orElseThrow(() ->
+                new IllegalArgumentException("Patient not found"));
 
-        ResponseEntity<?> hasPermission = checkPermissions("WATCH_PATIENT_APPOINTMENTS");
-        if (hasPermission != null) {
-            return hasPermission;
-        }
-
-        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
-        if (doctor == null) {
-            return ResponseEntity.badRequest().body("Doctor not found");
-        }
+        User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
+                new RuntimeException("Doctor not found"));
 
         checkDoctorOfPatient(patient, doctor, "Watch Patient Appointments", unauthorizedAccessRepository);
+
         Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
         if (appointments.isEmpty()) {
-            return ResponseEntity.ok("No appointments found");
+            throw new NoContentException("No appointments found");
         }
 
-        Page<AppointmentDTO> appointmentDTOS = appointments.map(AppointmentDTO::new);
-
-        return ResponseEntity.ok(appointmentDTOS);
+        return appointments;
     }
 }

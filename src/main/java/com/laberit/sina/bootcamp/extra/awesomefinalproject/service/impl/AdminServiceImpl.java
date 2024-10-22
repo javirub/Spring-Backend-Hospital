@@ -9,11 +9,12 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserReposi
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
@@ -31,84 +32,73 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> registerUser(UserDTO userDTO) {
+    public User registerUser(UserDTO userDTO) {
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+            throw new IllegalArgumentException("Username" + userDTO.getUsername() + "already exists");
         }
 
-        ResponseEntity<?> hasPermissions = checkPermissions("REGISTER_USER");
-        if (hasPermissions != null) {
-            return hasPermissions;
-        }
+        checkPermissions("REGISTER_USER");
 
-        Role role = roleRepository.findByName(RoleName.valueOf(userDTO.getRole())).orElse(null);
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role not found");
-        }
+        Role role = roleRepository.findByName(RoleName.valueOf(userDTO.getRole()))
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
         User newUser = new User(userDTO, role);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(newUser);
-        return ResponseEntity.ok(newUser);
+        return newUser;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateUser(Long id, UserDTO userDTO) {
+    public User updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElse(null);
 
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+            throw new IllegalArgumentException("Username" + userDTO.getUsername() + "already exists");
         }
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            throw new IllegalArgumentException("User not found");
         }
 
-        ResponseEntity<?> hasPermissions = checkPermissions("UPDATE_USER");
-        if (hasPermissions != null) {
-            return hasPermissions;
+        checkPermissions("UPDATE_USER");
+
+        if (!userDTO.getUsername().equals("admin")) {
+            user.setUsername(userDTO.getUsername());
+        } else {
+            throw new IllegalArgumentException("Admin username cannot be changed");
         }
 
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        if (!userDTO.getUsername().equals("admin")) {
-            user.setUsername(userDTO.getUsername());
-        }
         user.setName(userDTO.getName());
         user.setSurnames(userDTO.getSurnames());
+
         roleRepository.findByName(RoleName.valueOf(userDTO.getRole())).ifPresent(user::setRole);
         userRepository.save(user);
-        return ResponseEntity.ok(user);
+        return user;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> deleteUser(Long id) {
+    public ResponseEntity<Map<String, Object>> deleteUser(Long id) {
+        checkPermissions("DELETE_USER");
         if (id == 1) {
-            return ResponseEntity.badRequest().body("Admin account cannot be deleted");
+            throw new IllegalArgumentException("Admin user cannot be deleted");
         }
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        ResponseEntity<?> hasPermissions = checkPermissions("DELETE_USER");
-        if (hasPermissions != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You don't have permissions to delete users");
+            throw new IllegalArgumentException("User not found");
         }
 
         userRepository.delete(user);
-        return ResponseEntity.ok("User: " + id + " deleted");
+        return ResponseEntity.ok(Map.of("id", id, "status", "Deleted"));
     }
 
     @Override
-    public ResponseEntity<?> listUsers(Pageable pageable) {
-        ResponseEntity<?> hasPermissions = checkPermissions("WATCH_USERS");
-        if (hasPermissions != null) {
-            return hasPermissions;
-        }
-        Page<User> usersPage = userRepository.findAll(pageable);
-        return ResponseEntity.ok(usersPage);
+    public Page<User> listUsers(Pageable pageable) {
+        checkPermissions("WATCH_USERS");
+
+        return userRepository.findAll(pageable);
     }
 }
