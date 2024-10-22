@@ -32,9 +32,11 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
         long cancelledCount = appointmentRepository.countByStatusIs(AppointmentStatus.CANCELLED);
         long pendingCount = appointmentRepository.countByStatusIs(AppointmentStatus.PENDING);
         long confirmedCount = appointmentRepository.countByStatusIs(AppointmentStatus.CONFIRMED);
+        long doneCount = appointmentRepository.countByStatusIs(AppointmentStatus.DONE);
+        long totalCount = cancelledCount + pendingCount + confirmedCount + doneCount;
 
-        return ResponseEntity.ok().body(Map.of("cancelled", cancelledCount,
-                "pending", pendingCount, "confirmed", confirmedCount));
+        return ResponseEntity.ok().body(Map.of("cancelled", cancelledCount, "pending", pendingCount,
+                "confirmed", confirmedCount, "done", doneCount, "total", totalCount));
     }
 
     @Override
