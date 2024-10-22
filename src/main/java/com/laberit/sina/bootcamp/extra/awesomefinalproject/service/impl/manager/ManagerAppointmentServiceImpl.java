@@ -4,6 +4,7 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Appointme
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.ManagerAppointmentService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,20 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
         if (hasPermission != null) return hasPermission;
 
 
-        long cancelledCount = appointmentRepository.countByStatusIs(AppointmentStatus.CANCELLED);
-        long pendingCount = appointmentRepository.countByStatusIs(AppointmentStatus.PENDING);
-        long confirmedCount = appointmentRepository.countByStatusIs(AppointmentStatus.CONFIRMED);
-        long doneCount = appointmentRepository.countByStatusIs(AppointmentStatus.DONE);
-        long totalCount = cancelledCount + pendingCount + confirmedCount + doneCount;
+        List<Object[]> statusCounts = appointmentRepository.countAppointmentsByStatus();
+        Map<String, Long> statusCountMap = statusCounts.stream()
+                .collect(Collectors.toMap(
+                        result -> ((AppointmentStatus) result[0]).name(),
+                        result -> (Long) result[1]
+                ));
+        long totalCount = statusCountMap.values().stream().mapToLong(Long::longValue).sum();
 
-        return ResponseEntity.ok().body(Map.of("cancelled", cancelledCount, "pending", pendingCount,
-                "confirmed", confirmedCount, "done", doneCount, "total", totalCount));
+        return ResponseEntity.ok().body(Map.of(
+                "cancelled", statusCountMap.getOrDefault(AppointmentStatus.CANCELLED.name(), 0L),
+                "pending", statusCountMap.getOrDefault(AppointmentStatus.PENDING.name(), 0L),
+                "confirmed", statusCountMap.getOrDefault(AppointmentStatus.CONFIRMED.name(), 0L),
+                "done", statusCountMap.getOrDefault(AppointmentStatus.DONE.name(), 0L),
+                "total", totalCount));
     }
 
     @Override
@@ -74,12 +81,13 @@ public class ManagerAppointmentServiceImpl implements ManagerAppointmentService 
             return ResponseEntity.noContent().build();
         }
 
-        Page<Map<String, Object>> doctorCounts = results.map(result -> Map.of(
-                "UserID", result[0],
-                "fullName", result[1] + " " + result[2],
+        List<Map<String, Object>> content = results.stream().map(result -> Map.of(
+                "doctorId", result[0],
+                "name", result[1],
+                "surnames", result[2],
                 "cancelledCount", result[3]
-        ));
+        )).collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(doctorCounts);
+        return ResponseEntity.ok(new PageImpl<>(content, pageable, results.getTotalElements()));
     }
 }
