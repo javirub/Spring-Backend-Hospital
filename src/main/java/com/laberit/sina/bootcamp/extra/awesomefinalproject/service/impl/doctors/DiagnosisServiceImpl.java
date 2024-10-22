@@ -4,7 +4,6 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Diagnosis;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateDiagnosisDTO;
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.DiagnosisDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.DiagnosisStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Disease;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.DiagnosisRepository;
@@ -12,8 +11,8 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRep
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.DiagnosisService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,24 +36,20 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> createDiagnosis(CreateDiagnosisDTO createDiagnosisDTO, String doctorsUsername) {
-        ResponseEntity<?> hasPermissions = checkPermissions("CREATE_DIAGNOSIS");
-        if (hasPermissions != null) {
-            return hasPermissions;
-        }
+    public Diagnosis createDiagnosis(CreateDiagnosisDTO createDiagnosisDTO, String doctorsUsername) {
+        checkPermissions("CREATE_DIAGNOSIS");
 
         Patient patient = patientRepository.findById(createDiagnosisDTO.getPatientId()).orElse(null);
         if (patient == null) {
-            return ResponseEntity.badRequest().body("Patient not found");
+            throw new IllegalArgumentException("Patient not found");
         }
 
         User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
-        if (doctor == null){
-            return ResponseEntity.badRequest().body("Doctor not found");
+        if (doctor == null) {
+            throw new IllegalArgumentException("Doctor not found");
         }
 
         checkDoctorOfPatient(patient, doctor, "Create Diagnosis", unauthorizedAccessRepository);
-
 
         Diagnosis diagnosis = new Diagnosis();
         diagnosis.setPatient(patient);
@@ -63,63 +58,46 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
         diagnosisRepository.save(diagnosis);
 
-        DiagnosisDTO diagnosisDTO = new DiagnosisDTO(diagnosis);
-        return ResponseEntity.ok(diagnosisDTO);
+        return diagnosis;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable) {
-        ResponseEntity<?> hasPermissions = checkPermissions("WATCH_DIAGNOSIS");
-        if (hasPermissions != null) {
-            return hasPermissions;
-        }
+    public Page<Diagnosis> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable) {
+        checkPermissions("WATCH_DIAGNOSIS");
 
-        Patient patient = patientRepository.findById(patientId).orElse(null);
+        Patient patient = patientRepository.findById(patientId).orElseThrow(() ->
+                new IllegalArgumentException("Patient not found"));
 
-        if (patient == null) {
-            return ResponseEntity.badRequest().body("Patient not found");
-        }
-
-        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
-        if (doctor == null){
-            return ResponseEntity.badRequest().body("Doctor not found");
-        }
+        User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
+                new IllegalArgumentException("Doctor not found"));
 
         checkDoctorOfPatient(patient, doctor, "List Diagnosis", unauthorizedAccessRepository);
 
-        return ResponseEntity.ok(diagnosisRepository.findAllByPatient(patient, pageable).map(DiagnosisDTO::new));
+        return diagnosisRepository.findAllByPatient(patient, pageable);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateDiagnosisStatus(Long diagnosisId,
-                                                   DiagnosisStatus diagnosisStatus, String doctorsUsername) {
-        ResponseEntity<?> hasPermissions = checkPermissions("UPDATE_DIAGNOSIS");
-        if (hasPermissions != null) {
-            return hasPermissions;
-        }
+    public Diagnosis updateDiagnosisStatus(Long diagnosisId,
+                                           DiagnosisStatus diagnosisStatus, String doctorsUsername) {
+        checkPermissions("UPDATE_DIAGNOSIS");
 
-        Diagnosis diagnosis = diagnosisRepository.findById(diagnosisId).orElse(null);
-        if (diagnosis == null) {
-            return ResponseEntity.badRequest().body("Diagnosis not found");
-        }
+        Diagnosis diagnosis = diagnosisRepository.findById(diagnosisId).orElseThrow(() ->
+                new IllegalArgumentException("Diagnosis not found"));
 
         Patient patient = diagnosis.getPatient();
-
         if (patient == null) {
-            return ResponseEntity.badRequest().body("Patient not found");
+            throw new IllegalArgumentException("Patient not found");
         }
 
-        User doctor = userRepository.findByUsername(doctorsUsername).orElse(null);
-        if (doctor == null){
-            return ResponseEntity.badRequest().body("Doctor not found");
-        }
+        User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
+                new IllegalArgumentException("Doctor not found"));
 
         checkDoctorOfPatient(patient, doctor, "Update Diagnosis", unauthorizedAccessRepository);
 
         diagnosis.setStatus(diagnosisStatus);
         diagnosisRepository.save(diagnosis);
-        return ResponseEntity.ok(new DiagnosisDTO(diagnosis));
+        return diagnosis;
     }
 }
