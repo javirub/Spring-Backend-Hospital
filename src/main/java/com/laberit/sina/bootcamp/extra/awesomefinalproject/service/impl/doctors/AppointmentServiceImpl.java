@@ -8,6 +8,7 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateAppo
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.AppointmentStatus;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.AppointmentService;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.AppointmentUtils.saveAppointmentAndReturn;
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkPatientDoctorPermission;
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
 @Service
@@ -27,12 +28,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final UnauthorizedAccessRepository unauthorizedAccessRepository;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, PatientRepository patientRepository,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository, UnauthorizedAccessRepository unauthorizedAccessRepository) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.unauthorizedAccessRepository = unauthorizedAccessRepository;
     }
 
     @Override
@@ -89,12 +92,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional
     public ResponseEntity<?> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable) {
         Patient patient = patientRepository.findById(patientId).orElse(null);
-        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, patient, doctorsUsername,
-                "WATCH_PATIENT_APPOINTMENTS");
-        if (check != null) {
-            return check;
+        if (patient == null) {
+            return ResponseEntity.badRequest().body("Patient not found");
         }
 
+        ResponseEntity<?> hasPermission = checkPermissions("WATCH_PATIENT_APPOINTMENTS");
+        if (hasPermission != null) {
+            return hasPermission;
+        }
+
+        checkDoctorOfPatient(patient, doctorsUsername, "Watch Patient Appointments", unauthorizedAccessRepository);
         Page<Appointment> appointments = appointmentRepository.findAllByPatientId(patientId, pageable);
         if (appointments.isEmpty()) {
             return ResponseEntity.ok("No appointments found");

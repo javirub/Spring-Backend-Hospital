@@ -8,6 +8,7 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Diagnosis
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Disease;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.DiagnosisRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.DiagnosisService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +16,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
-import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkPatientDoctorPermission;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
 @Service
 public class DiagnosisServiceImpl implements DiagnosisService {
     private final PatientRepository patientRepository;
     private final DiagnosisRepository diagnosisRepository;
+    private final UnauthorizedAccessRepository unauthorizedAccessRepository;
 
-    public DiagnosisServiceImpl(PatientRepository patientRepository, DiagnosisRepository diagnosisRepository) {
+    public DiagnosisServiceImpl(PatientRepository patientRepository, DiagnosisRepository diagnosisRepository,
+                                UnauthorizedAccessRepository unauthorizedAccessRepository) {
         this.patientRepository = patientRepository;
         this.diagnosisRepository = diagnosisRepository;
+        this.unauthorizedAccessRepository = unauthorizedAccessRepository;
     }
 
     @Override
@@ -41,10 +44,8 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return ResponseEntity.badRequest().body("Patient not found");
         }
 
-        ResponseEntity<?> isDoctorOfPatient = checkDoctorOfPatient(patient, doctorsUsername);
-        if (isDoctorOfPatient != null) {
-            return isDoctorOfPatient;
-        }
+        checkDoctorOfPatient(patient, doctorsUsername, "Create Diagnosis", unauthorizedAccessRepository);
+
 
         Diagnosis diagnosis = new Diagnosis();
         diagnosis.setPatient(patient);
@@ -60,31 +61,43 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     @Override
     @Transactional
     public ResponseEntity<?> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable) {
-        Patient patient = patientRepository.findById(patientId).orElse(null);
-        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, patient,
-                doctorsUsername, "WATCH_DIAGNOSIS");
-
-        if (check != null) {
-            return check;
+        ResponseEntity<?> hasPermissions = checkPermissions("WATCH_DIAGNOSIS");
+        if (hasPermissions != null) {
+            return hasPermissions;
         }
+
+        Patient patient = patientRepository.findById(patientId).orElse(null);
+
+        if (patient == null) {
+            return ResponseEntity.badRequest().body("Patient not found");
+        }
+
+        checkDoctorOfPatient(patient, doctorsUsername, "List Diagnosis", unauthorizedAccessRepository);
 
         return ResponseEntity.ok(diagnosisRepository.findAllByPatient(patient, pageable).map(DiagnosisDTO::new));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateDiagnosis(Long diagnosisId, DiagnosisStatus diagnosisStatus, String doctorsUsername) {
+    public ResponseEntity<?> updateDiagnosisStatus(Long diagnosisId,
+                                                   DiagnosisStatus diagnosisStatus, String doctorsUsername) {
+        ResponseEntity<?> hasPermissions = checkPermissions("UPDATE_DIAGNOSIS");
+        if (hasPermissions != null) {
+            return hasPermissions;
+        }
+
         Diagnosis diagnosis = diagnosisRepository.findById(diagnosisId).orElse(null);
         if (diagnosis == null) {
             return ResponseEntity.badRequest().body("Diagnosis not found");
         }
 
-        ResponseEntity<?> check = checkPatientDoctorPermission(patientRepository, diagnosis.getPatient(),
-                doctorsUsername, "UPDATE_DIAGNOSIS");
+        Patient patient = diagnosis.getPatient();
 
-        if (check != null) {
-            return check;
+        if (patient == null) {
+            return ResponseEntity.badRequest().body("Patient not found");
         }
+
+        checkDoctorOfPatient(patient, doctorsUsername, "Update Diagnosis", unauthorizedAccessRepository);
 
         diagnosis.setStatus(diagnosisStatus);
         diagnosisRepository.save(diagnosis);

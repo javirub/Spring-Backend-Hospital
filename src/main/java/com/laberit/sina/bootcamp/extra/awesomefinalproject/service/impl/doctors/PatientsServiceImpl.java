@@ -1,8 +1,10 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.UnauthorizedAccess;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.PatientsService;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +18,13 @@ import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.Permissi
 public class PatientsServiceImpl implements PatientsService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final UnauthorizedAccessRepository unauthorizedAccessRepository;
 
-    public PatientsServiceImpl(PatientRepository patientRepository, UserRepository userRepository) {
+    public PatientsServiceImpl(PatientRepository patientRepository, UserRepository userRepository,
+                               UnauthorizedAccessRepository unauthorizedAccessRepository) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.unauthorizedAccessRepository = unauthorizedAccessRepository;
     }
 
     @Override
@@ -58,9 +63,13 @@ public class PatientsServiceImpl implements PatientsService {
         }
 
         if (!patient.getDoctors().contains(doctor)) {
-            return ResponseEntity.badRequest().body("You are not allowed to see this patient");
+            UnauthorizedAccess unauthorizedAccess = new UnauthorizedAccess();
+            unauthorizedAccess.setPatientId(patientId);
+            unauthorizedAccess.setDoctorUsername(doctorsUsername);
+            unauthorizedAccess.setTimestamp(java.time.LocalDateTime.now());
+            unauthorizedAccess.setQuery("Get Patient Details");
+            unauthorizedAccessRepository.save(unauthorizedAccess);
         }
-
         return ResponseEntity.ok(patient);
     }
 }

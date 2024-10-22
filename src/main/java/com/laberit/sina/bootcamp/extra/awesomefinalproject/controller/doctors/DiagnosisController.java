@@ -38,6 +38,6 @@ public class DiagnosisController {
     @ResponseBody
     public ResponseEntity<?> updateDiagnosis(@PathVariable Long diagnosisId, @RequestParam DiagnosisStatus diagnosisStatus, Principal principal) {
         String doctorsUsername = principal.getName();
-        return diagnosisService.updateDiagnosis(diagnosisId, diagnosisStatus, doctorsUsername);
+        return diagnosisService.updateDiagnosisStatus(diagnosisId, diagnosisStatus, doctorsUsername);
     }
 }

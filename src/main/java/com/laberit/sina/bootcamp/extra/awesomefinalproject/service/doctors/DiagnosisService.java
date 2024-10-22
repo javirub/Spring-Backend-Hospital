@@ -10,5 +10,5 @@ public interface DiagnosisService {
 
     ResponseEntity<?> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable);
 
-    ResponseEntity<?> updateDiagnosis(Long diagnosisId, DiagnosisStatus diagnosisStatus, String doctorsUsername);
+    ResponseEntity<?> updateDiagnosisStatus(Long diagnosisId, DiagnosisStatus diagnosisStatus, String doctorsUsername);
 }
