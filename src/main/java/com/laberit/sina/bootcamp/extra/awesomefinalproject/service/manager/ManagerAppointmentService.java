@@ -1,12 +1,14 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager;
 
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 public interface ManagerAppointmentService {
-    ResponseEntity<?> appointmentsByStatus();
+    Map<String, Long> appointmentsByStatus();
 
-    ResponseEntity<?> cancelledAppointmentsByAge();
+    Map<Integer, Long> cancelledAppointmentsByAge();
 
-    ResponseEntity<?> cancelledAppointmentsByDoctor(Pageable pageable);
+    PageImpl<Map<String, Object>> cancelledAppointmentsByDoctor(Pageable pageable);
 }

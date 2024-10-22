@@ -1,11 +1,12 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffice.manager;
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.DemographicService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/backoffice/manager/patients")
@@ -18,19 +19,19 @@ public class DemographicController {
 
     @GetMapping("/gender")
     @ResponseBody
-    public ResponseEntity<?> patientsByGender() {
+    public Map<String, Integer> patientsByGender() {
         return demographicService.patientsByGender();
     }
 
     @GetMapping("/age")
     @ResponseBody
-    public ResponseEntity<?> patientsByAge() {
-        return demographicService.patientsByAge();
+    public Map<String, Double> patientsMeanAge() {
+        return demographicService.patientsMeanAge();
     }
 
     @GetMapping("/diagnosis")
     @ResponseBody
-    public ResponseEntity<?> patientsWithDiagnosis() {
+    public Map<String, Long> patientsWithDiagnosis() {
         return demographicService.patientsWithDiagnosis();
     }
 }
