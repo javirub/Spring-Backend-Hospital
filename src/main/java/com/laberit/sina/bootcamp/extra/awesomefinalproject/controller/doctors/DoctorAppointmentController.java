@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/doctors/appointment")
@@ -42,7 +41,7 @@ public class DoctorAppointmentController {
      * @return - A list of appointments filtered by the parameters
      */
     @GetMapping("/list")
-    public List<AppointmentDTO> listPatientAppointments(Principal principal, Pageable pageable,
+    public Page<AppointmentDTO> listPatientAppointments(Principal principal, Pageable pageable,
                                                         @RequestParam(required = false) Long patientId,
                                                         @RequestParam(required = false) String status,
                                                         @RequestParam(required = false) String beforeDate,
@@ -52,7 +51,7 @@ public class DoctorAppointmentController {
         String doctorsUsername = principal.getName();
         Page<Appointment> appointments = appointmentService.listPatientAppointments(patientId, status, beforeDate,
                 afterDate, doctorId, forceAll, doctorsUsername, pageable);
-        return appointments.map(AppointmentDTO::new).getContent();
+        return appointments.map(AppointmentDTO::new);
     }
 
     @PutMapping("/confirm/{appointmentId}")
