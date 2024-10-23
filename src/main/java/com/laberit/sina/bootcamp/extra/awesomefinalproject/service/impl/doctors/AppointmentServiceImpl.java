@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DateParser.parseDate;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
@@ -86,7 +85,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public Page<Appointment> listPatientAppointments(Long patientId, String status, String beforeDate, String afterDate,
-                                                     Long doctorId, boolean forceAll, String doctorsUsername, Pageable pageable) {
+                                                     Long doctorId, String doctorsUsername, Pageable pageable) {
         checkPermissions("WATCH_PATIENT_APPOINTMENTS");
 
         User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
@@ -101,23 +100,27 @@ public class AppointmentServiceImpl implements AppointmentService {
             checkDoctorOfPatient(patient, doctor, "List Appointments", unauthorizedAccessRepository);
         }
 
+        if (doctorId != null) {
+            UnauthorizedAccess unauthorizedAccess = new UnauthorizedAccess();
+            unauthorizedAccess.setDoctor(doctor);
+            unauthorizedAccess.setPatient(patient);
+
+            doctor = userRepository.findById(doctorId).orElseThrow(() ->
+                    new NoContentException("Doctor not found"));
+            unauthorizedAccess.setQuery("List appointments from another doctor with ID: " + doctor.getId());
+            unauthorizedAccessRepository.save(unauthorizedAccess);
+        }
+
         LocalDateTime beforeDateTime = parseDate(beforeDate);
         LocalDateTime afterDateTime = parseDate(afterDate);
 
-        Specification<Appointment> specification = Specification.where(AppointmentSpecification.beforeDate(beforeDateTime))
+        Specification<Appointment> specification;
+
+        specification = Specification.where(AppointmentSpecification.beforeDate(beforeDateTime))
                 .and(AppointmentSpecification.afterDate(afterDateTime))
                 .and(AppointmentSpecification.hasPatient(patient))
                 .and(AppointmentSpecification.hasStatus(status))
                 .and(AppointmentSpecification.hasDoctor(doctor));
-
-        if (forceAll) {
-            UnauthorizedAccess unauthorizedAccess = new UnauthorizedAccess();
-            unauthorizedAccess.setDoctor(doctor);
-            unauthorizedAccess.setQuery("List All Appointments with forceAll, filters: " + Map.of("patientId", patientId,
-                    "status", status, "beforeDate", beforeDate, "afterDate", afterDate, "doctorId", doctorId));
-            unauthorizedAccess.setTimestamp(LocalDateTime.now());
-            unauthorizedAccessRepository.save(unauthorizedAccess);
-        }
 
         return appointmentRepository.findAll(specification, pageable);
     }

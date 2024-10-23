@@ -37,7 +37,6 @@ public class DoctorAppointmentController {
      * @param beforeDate - If specified, filter up to this Date
      * @param afterDate  - If specified, filter from this Date
      * @param doctorId   - If specified, filter the Patient's doctor
-     * @param forceAll   - If true, ignore the doctorId and list all appointments
      * @return - A list of appointments filtered by the parameters
      */
     @GetMapping("/list")
@@ -46,11 +45,10 @@ public class DoctorAppointmentController {
                                                         @RequestParam(required = false) String status,
                                                         @RequestParam(required = false) String beforeDate,
                                                         @RequestParam(required = false) String afterDate,
-                                                        @RequestParam(required = false) Long doctorId,
-                                                        @RequestParam(defaultValue = "false") boolean forceAll) {
+                                                        @RequestParam(required = false) Long doctorId) {
         String doctorsUsername = principal.getName();
         Page<Appointment> appointments = appointmentService.listPatientAppointments(patientId, status, beforeDate,
-                afterDate, doctorId, forceAll, doctorsUsername, pageable);
+                afterDate, doctorId, doctorsUsername, pageable);
         return appointments.map(AppointmentDTO::new);
     }
 
