@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -16,5 +17,5 @@ public interface AdminService {
 
     ResponseEntity<Map<String, Object>> deleteUser(Long id);
 
-    Page<User> listUsers(Pageable pageable);
+    Page<User> listUsers(Pageable pageable, String name, String surnames, String role, String username, List<String> permissions);
 }

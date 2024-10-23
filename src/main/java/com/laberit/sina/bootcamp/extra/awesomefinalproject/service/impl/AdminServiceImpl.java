@@ -1,5 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.NoContentException;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
@@ -7,13 +8,16 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.specification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
@@ -96,9 +100,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<User> listUsers(Pageable pageable) {
+    @Transactional
+    public Page<User> listUsers(Pageable pageable, String name, String surnames, String role,
+                                String username, List<String> permissions) {
         checkPermissions("WATCH_USERS");
 
-        return userRepository.findAll(pageable);
+        Specification<User> spec = Specification.where(UserSpecification.hasName(name))
+                .and(UserSpecification.hasSurnames(surnames))
+                .and(UserSpecification.hasRole(role))
+                .and(UserSpecification.hasPermissions(permissions))
+                .and(UserSpecification.hasUsername(username));
+
+        Page<User> usersList = userRepository.findAll(spec, pageable);
+
+        if (usersList.isEmpty()) {
+            throw new NoContentException("No users found");
+        }
+
+        return usersList;
     }
 }
