@@ -20,13 +20,10 @@ public class DemographicServiceImpl implements DemographicService {
 
     @Override
     @Transactional
-    public Map<String, Integer> patientsByGender() {
+    public Map<Gender, Long> patientsByGender() {
         checkPermissions("WATCH_PATIENT_STATISTICS");
 
-        int maleCount = patientRepository.countPatientByGender(Gender.MALE);
-        int femaleCount = patientRepository.countPatientByGender(Gender.FEMALE);
-
-        return Map.of("male", maleCount, "female", femaleCount);
+        return patientRepository.countPatientsByGender();
     }
 
     @Override

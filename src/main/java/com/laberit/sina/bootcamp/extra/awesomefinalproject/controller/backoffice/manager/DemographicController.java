@@ -1,5 +1,6 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.controller.backoffice.manager;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Gender;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.DemographicService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ public class DemographicController {
     }
 
     @GetMapping("/gender")
-    public Map<String, Integer> patientsByGender() {
+    public Map<Gender, Long> patientsByGender() {
         return demographicService.patientsByGender();
     }
 
