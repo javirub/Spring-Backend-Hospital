@@ -26,10 +26,13 @@ public class DiagnosisController {
         return diagnosisService.createDiagnosis(createDiagnosisDTO, doctorsUsername);
     }
 
-    @GetMapping("/list/{patientId}")
-    public Page<Diagnosis> listDiagnosis(@PathVariable Long patientId, Principal principal, Pageable pageable) {
+    @GetMapping("/list")
+    public Page<Diagnosis> listDiagnosis(Principal principal, Pageable pageable,
+                                         @RequestParam(required = false) Long patientId,
+                                         @RequestParam(required = false) String disease,
+                                         @RequestParam(required = false) String status) {
         String doctorsUsername = principal.getName();
-        return diagnosisService.listDiagnosis(patientId, doctorsUsername, pageable);
+        return diagnosisService.listDiagnosis(patientId, disease, status, doctorsUsername, pageable);
     }
 
     @PutMapping("/update/{diagnosisId}")

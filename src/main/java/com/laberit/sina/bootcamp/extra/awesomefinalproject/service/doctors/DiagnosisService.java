@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface DiagnosisService {
     Diagnosis createDiagnosis(CreateDiagnosisDTO createDiagnosisDTO, String doctorsUsername);
 
-    Page<Diagnosis> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable);
+    Page<Diagnosis> listDiagnosis(Long patientId, String disease, String status, String doctorsUsername, Pageable pageable);
 
     Diagnosis updateDiagnosisStatus(Long diagnosisId, DiagnosisStatus diagnosisStatus, String doctorsUsername);
 }
