@@ -1,11 +1,12 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.manager;
 
-import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.Gender;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.GenderCount;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.DemographicService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
@@ -20,7 +21,7 @@ public class DemographicServiceImpl implements DemographicService {
 
     @Override
     @Transactional
-    public Map<Gender, Long> patientsByGender() {
+    public List<GenderCount> patientsByGender() {
         checkPermissions("WATCH_PATIENT_STATISTICS");
 
         return patientRepository.countPatientsByGender();
