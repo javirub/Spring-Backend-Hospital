@@ -1,10 +1,13 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.IsAnActiveDoctorException;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.NoContentException;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
@@ -27,11 +30,16 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
 
-    public AdminServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AdminServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
+                            AppointmentRepository appointmentRepository, PatientRepository patientRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
@@ -89,10 +97,15 @@ public class AdminServiceImpl implements AdminService {
         if (id == 1) {
             throw new IllegalArgumentException("Admin user cannot be deleted");
         }
-        User user = userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("User not found"));
 
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
+        if (appointmentRepository.findFirstByDoctor(user).isPresent()) {
+            throw new IsAnActiveDoctorException("User has appointments, cannot be deleted");
+        }
+
+        if (patientRepository.findFirstByDoctorsContaining(user).isPresent()) {
+            throw new IsAnActiveDoctorException("User is a doctor of a patient, cannot be deleted");
         }
 
         userRepository.delete(user);

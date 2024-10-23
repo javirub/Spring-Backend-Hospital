@@ -9,9 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     Page<Patient> findByDoctorsContaining(User doctor, Pageable pageable);
+
+    Optional<Patient> findFirstByDoctorsContaining(User doctor);
 
     @Query(value = "SELECT AVG(EXTRACT(YEAR FROM AGE(p.birth_date))) FROM patient p", nativeQuery = true)
     double getMeanAge();
