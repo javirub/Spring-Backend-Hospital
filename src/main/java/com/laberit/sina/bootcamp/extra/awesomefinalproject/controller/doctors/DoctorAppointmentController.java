@@ -27,10 +27,30 @@ public class DoctorAppointmentController {
         return new AppointmentDTO(appointmentService.createAppointment(createAppointmentDTO, doctorsUsername));
     }
 
-    @GetMapping("/list/{patientId}")
-    public Page<AppointmentDTO> listPatientAppointments(@PathVariable Long patientId, Principal principal, Pageable pageable) {
+    /**
+     * List appointments,
+     *
+     * @param principal  - principal to obtain the username
+     * @param pageable   - pageable object
+     * @param patientId  - If specified, filter by patient id
+     * @param status     - If specified, filter by status
+     * @param beforeDate - If specified, filter up to this Date
+     * @param afterDate  - If specified, filter from this Date
+     * @param doctorId   - If specified, filter the Patient's doctor
+     * @param forceAll   - If true, ignore the doctorId and list all appointments
+     * @return - A list of appointments filtered by the parameters
+     */
+    @GetMapping("/list")
+    public Page<AppointmentDTO> listPatientAppointments(Principal principal, Pageable pageable,
+                                                        @RequestParam(required = false) Long patientId,
+                                                        @RequestParam(required = false) String status,
+                                                        @RequestParam(required = false) String beforeDate,
+                                                        @RequestParam(required = false) String afterDate,
+                                                        @RequestParam(required = false) Long doctorId,
+                                                        @RequestParam(defaultValue = "false") boolean forceAll) {
         String doctorsUsername = principal.getName();
-        Page<Appointment> appointments = appointmentService.listPatientAppointments(patientId, doctorsUsername, pageable);
+        Page<Appointment> appointments = appointmentService.listPatientAppointments(patientId, status, beforeDate,
+                afterDate, doctorId, forceAll, doctorsUsername, pageable);
         return appointments.map(AppointmentDTO::new);
     }
 

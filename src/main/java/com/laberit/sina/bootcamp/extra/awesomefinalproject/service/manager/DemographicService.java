@@ -1,9 +1,12 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.GenderCount;
+
+import java.util.List;
 import java.util.Map;
 
 public interface DemographicService {
-    Map<String, Integer> patientsByGender();
+    List<GenderCount> patientsByGender();
 
     Map<String, Double> patientsMeanAge();
 

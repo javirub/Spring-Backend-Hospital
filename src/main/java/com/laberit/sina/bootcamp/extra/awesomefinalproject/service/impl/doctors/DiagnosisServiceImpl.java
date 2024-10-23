@@ -2,6 +2,7 @@ package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl.doctors
 
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Diagnosis;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.UnauthorizedAccess;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.CreateDiagnosisDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.DiagnosisStatus;
@@ -11,10 +12,14 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRep
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UnauthorizedAccessRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.doctors.DiagnosisService;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.specification.DiagnosisSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
@@ -61,18 +66,33 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
     @Override
     @Transactional
-    public Page<Diagnosis> listDiagnosis(Long patientId, String doctorsUsername, Pageable pageable) {
+    public Page<Diagnosis> listDiagnosis(Long patientId, String disease, String status,
+                                         String doctorsUsername, Pageable pageable) {
         checkPermissions("WATCH_DIAGNOSIS");
-
-        Patient patient = patientRepository.findById(patientId).orElseThrow(() ->
-                new IllegalArgumentException("Patient not found"));
 
         User doctor = userRepository.findByUsername(doctorsUsername).orElseThrow(() ->
                 new IllegalArgumentException("Doctor not found"));
 
-        checkDoctorOfPatient(patient, doctor, "List Diagnosis", unauthorizedAccessRepository);
+        Specification<Diagnosis> spec;
+        if (patientId == null){
+            UnauthorizedAccess unauthorizedAccess = new UnauthorizedAccess();
+            unauthorizedAccess.setDoctor(doctor);
+            unauthorizedAccess.setTimestamp(LocalDateTime.now());
+            unauthorizedAccess.setQuery("List All Diagnosis");
+            unauthorizedAccessRepository.save(unauthorizedAccess);
 
-        return diagnosisRepository.findAllByPatient(patient, pageable);
+            spec = Specification.where(DiagnosisSpecification.hasDisease(disease))
+                    .and(DiagnosisSpecification.hasStatus(status));
+        } else {
+            Patient patient = patientRepository.findById(patientId).orElseThrow(() ->
+                new IllegalArgumentException("Patient not found"));
+            checkDoctorOfPatient(patient, doctor, "List Diagnosis", unauthorizedAccessRepository);
+            spec = Specification.where(DiagnosisSpecification.hasPatient(patient))
+                    .and(DiagnosisSpecification.hasDisease(disease))
+                    .and(DiagnosisSpecification.hasStatus(status));
+        }
+
+        return diagnosisRepository.findAll(spec, pageable);
     }
 
     @Override

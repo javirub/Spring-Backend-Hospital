@@ -1,14 +1,17 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager;
 
-import org.springframework.data.domain.PageImpl;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.AppointmentStatusCount;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.CancelledAppointmentsByAge;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.CancelledAppointmentsByDoctor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
+import java.util.List;
 
 public interface ManagerAppointmentService {
-    Map<String, Long> appointmentsByStatus();
+    List<AppointmentStatusCount> appointmentsByStatus();
 
-    Map<Integer, Long> cancelledAppointmentsByAge();
+    Page<CancelledAppointmentsByAge> cancelledAppointmentsByAge(Pageable pageable);
 
-    PageImpl<Map<String, Object>> cancelledAppointmentsByDoctor(Pageable pageable);
+    Page<CancelledAppointmentsByDoctor> cancelledAppointmentsByDoctor(Pageable pageable);
 }

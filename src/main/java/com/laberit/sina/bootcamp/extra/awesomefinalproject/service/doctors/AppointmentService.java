@@ -10,5 +10,6 @@ public interface AppointmentService {
 
     Appointment confirmAppointment(Long appointmentId);
 
-    Page<Appointment> listPatientAppointments(Long patientId, String doctorsUsername, Pageable pageable);
+    Page<Appointment> listPatientAppointments(Long patientId, String status, String beforeDate, String afterDate,
+                                              Long doctorId, boolean forceAll, String doctorsUsername, Pageable pageable);
 }

@@ -1,19 +1,26 @@
 package com.laberit.sina.bootcamp.extra.awesomefinalproject.service.impl;
 
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.IsAnActiveDoctorException;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.exception.NoContentException;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Role;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.dtos.UserDTO;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.enums.RoleName;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.AppointmentRepository;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.PatientRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.RoleRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.repository.UserRepository;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.AdminService;
+import com.laberit.sina.bootcamp.extra.awesomefinalproject.specification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
@@ -23,11 +30,16 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
 
-    public AdminServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AdminServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
+                            AppointmentRepository appointmentRepository, PatientRepository patientRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
@@ -85,10 +97,15 @@ public class AdminServiceImpl implements AdminService {
         if (id == 1) {
             throw new IllegalArgumentException("Admin user cannot be deleted");
         }
-        User user = userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("User not found"));
 
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
+        if (appointmentRepository.findFirstByDoctor(user).isPresent()) {
+            throw new IsAnActiveDoctorException("User has appointments, cannot be deleted");
+        }
+
+        if (patientRepository.findFirstByDoctorsContaining(user).isPresent()) {
+            throw new IsAnActiveDoctorException("User is a doctor of a patient, cannot be deleted");
         }
 
         userRepository.delete(user);
@@ -96,9 +113,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<User> listUsers(Pageable pageable) {
+    @Transactional
+    public Page<User> listUsers(Pageable pageable, String name, String surnames, String role,
+                                String username, List<String> permissions) {
         checkPermissions("WATCH_USERS");
 
-        return userRepository.findAll(pageable);
+        Specification<User> spec = Specification.where(UserSpecification.hasName(name))
+                .and(UserSpecification.hasSurnames(surnames))
+                .and(UserSpecification.hasRole(role))
+                .and(UserSpecification.hasPermissions(permissions))
+                .and(UserSpecification.hasUsername(username));
+
+        Page<User> usersList = userRepository.findAll(spec, pageable);
+
+        if (usersList.isEmpty()) {
+            throw new NoContentException("No users found");
+        }
+
+        return usersList;
     }
 }

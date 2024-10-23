@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,7 +46,12 @@ public class AdminController {
     }
 
     @GetMapping("/list")
-    public Page<User> listUsers(Pageable pageable) {
-        return adminService.listUsers(pageable);
+    public Page<User> listUsers(Pageable pageable,
+                                @RequestParam(required = false) String name,
+                                @RequestParam(required = false) String surnames,
+                                @RequestParam(required = false) String role,
+                                @RequestParam(required = false) String username,
+                                @RequestParam(required = false) List<String> permissions) {
+        return adminService.listUsers(pageable, name, surnames, role, username, permissions);
     }
 }
