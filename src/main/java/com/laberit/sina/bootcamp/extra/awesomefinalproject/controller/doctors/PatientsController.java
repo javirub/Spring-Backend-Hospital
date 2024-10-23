@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/doctors/patients")
@@ -22,10 +23,10 @@ public class PatientsController {
     }
 
     @GetMapping("/list")
-    public Page<PatientDTO> listMyPatients(Principal principal, Pageable pageable) {
+    public List<PatientDTO> listMyPatients(Principal principal, Pageable pageable) {
         String doctorsUsername = principal.getName();
         Page<Patient> patients = patientsService.listMyPatients(doctorsUsername, pageable);
-        return patients.map(PatientDTO::new);
+        return patients.map(PatientDTO::new).getContent();
     }
 
     @GetMapping("/list/{patientId}")

@@ -5,6 +5,8 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.Patient;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.User;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDateTime;
+
 public class AppointmentSpecification {
     public static Specification<Appointment> hasPatient(Patient patient) {
         return (root, query, criteriaBuilder) ->
@@ -16,14 +18,14 @@ public class AppointmentSpecification {
                 status == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("status").as(String.class), status);
     }
 
-    public static Specification<Appointment> beforeDate(String beforeDate) {
+    public static Specification<Appointment> beforeDate(LocalDateTime beforeDate) {
         return (root, query, criteriaBuilder) ->
-                beforeDate == null ? criteriaBuilder.conjunction() : criteriaBuilder.lessThanOrEqualTo(root.get("date").as(String.class), beforeDate);
+                beforeDate == null ? criteriaBuilder.conjunction() : criteriaBuilder.lessThanOrEqualTo(root.get("date"), beforeDate);
     }
 
-    public static Specification<Appointment> afterDate(String afterDate) {
+    public static Specification<Appointment> afterDate(LocalDateTime afterDate) {
         return (root, query, criteriaBuilder) ->
-                afterDate == null ? criteriaBuilder.conjunction() : criteriaBuilder.greaterThanOrEqualTo(root.get("date").as(String.class), afterDate);
+                afterDate == null ? criteriaBuilder.conjunction() : criteriaBuilder.greaterThanOrEqualTo(root.get("date"), afterDate);
     }
 
     public static Specification<Appointment> hasDoctor(User doctor) {

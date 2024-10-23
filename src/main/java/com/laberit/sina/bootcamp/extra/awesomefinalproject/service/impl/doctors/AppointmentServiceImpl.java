@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DateParser.parseDate;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.DoctorUtils.checkDoctorOfPatient;
 import static com.laberit.sina.bootcamp.extra.awesomefinalproject.utils.PermissionUtils.checkPermissions;
 
@@ -100,8 +101,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             checkDoctorOfPatient(patient, doctor, "List Appointments", unauthorizedAccessRepository);
         }
 
-        Specification<Appointment> specification = Specification.where(AppointmentSpecification.beforeDate(beforeDate))
-                .and(AppointmentSpecification.afterDate(afterDate))
+        LocalDateTime beforeDateTime = parseDate(beforeDate);
+        LocalDateTime afterDateTime = parseDate(afterDate);
+
+        Specification<Appointment> specification = Specification.where(AppointmentSpecification.beforeDate(beforeDateTime))
+                .and(AppointmentSpecification.afterDate(afterDateTime))
                 .and(AppointmentSpecification.hasPatient(patient))
                 .and(AppointmentSpecification.hasStatus(status))
                 .and(AppointmentSpecification.hasDoctor(doctor));

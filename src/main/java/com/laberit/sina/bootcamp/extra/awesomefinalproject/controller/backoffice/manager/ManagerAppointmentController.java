@@ -4,7 +4,6 @@ import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.App
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.CancelledAppointmentsByAge;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.model.projections.CancelledAppointmentsByDoctor;
 import com.laberit.sina.bootcamp.extra.awesomefinalproject.service.manager.ManagerAppointmentService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +27,12 @@ public class ManagerAppointmentController {
     }
 
     @GetMapping("/cancelled_appointments_by_age")
-    public Page<CancelledAppointmentsByAge> cancelledAppointmentsByAge(Pageable pageable) {
-        return managerAppointmentService.cancelledAppointmentsByAge(pageable);
+    public List<CancelledAppointmentsByAge> cancelledAppointmentsByAge(Pageable pageable) {
+        return managerAppointmentService.cancelledAppointmentsByAge(pageable).getContent();
     }
 
     @GetMapping("/cancelled_appointments_by_doctor")
-    public Page<CancelledAppointmentsByDoctor> cancelledAppointmentsByDoctor(Pageable pageable) {
-        return managerAppointmentService.cancelledAppointmentsByDoctor(pageable);
+    public List<CancelledAppointmentsByDoctor> cancelledAppointmentsByDoctor(Pageable pageable) {
+        return managerAppointmentService.cancelledAppointmentsByDoctor(pageable).getContent();
     }
 }
