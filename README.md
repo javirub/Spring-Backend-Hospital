@@ -5,10 +5,10 @@ Un Sistema de Información Hospitalaria (HIS, por sus siglas en inglés) es un s
 
 ### Funcionalidades principales:
 - **Gestión de historias clínicas electrónicas**: Permite consultar diagnósticos, tratamientos, y resultados de pruebas médicas.
-- **Gestión de pacientes**: Posibilita dar de alta a pacientes, gestionar dietas, seguimiento de la estancia hospitalaria, y administrar tratamientos.
+- **Gestión de pacientes**: Posibilita dar de alta a pacientes, gestionar dietas, seguimiento de la estancia hospitalaria, y administrar tratamientos. TODO
 - **Citas médicas**: Permite programar, modificar y cancelar citas médicas.
-- **Gestión de recursos hospitalarios**: Administra camas, quirófanos y equipos médicos.
-- **Facturación y finanzas**: Maneja seguros de salud, generación de facturas y procesamiento de pagos.
+- **Gestión de recursos hospitalarios**: Administra camas, quirófanos y equipos médicos. TODO
+- **Facturación y finanzas**: Maneja seguros de salud, generación de facturas y procesamiento de pagos. TODO
 
 ### Roles de usuario
 El HIS está diseñado para soportar distintos roles, cada uno con permisos específicos según sus responsabilidades:
