@@ -27,7 +27,7 @@ Para facilitar el acceso, el sistema viene con usuarios predefinidos:
 | Médico       | `doctor`      | `doctor`   |
 
 ## 2. Endpoints
-La aplicación cuenta con una serie de endpoints organizados por funcionalidad. A continuación, se presenta un resumen de los endpoints disponibles:
+La aplicación cuenta con una serie de endpoints organizados por funcionalidad. A continuación, se presenta un resumen de los endpoints disponibles, pero se recomienda acceder al swagger para obtener más información, una vez levantada la aplicación puedes acceder desde la url de tu servidor:8051/swagger.html, si estas en local: localhost:8051/swagger.html
 
 ### 2.1. Controlador de Usuarios (`user-controller`)
 - **PUT** `/user/change_password`: Cambia la contraseña del usuario autenticado.
