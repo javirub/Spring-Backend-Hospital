@@ -71,7 +71,7 @@ Para ejecutar esta aplicación, sigue estos pasos:
   - Git
 2. **Clonar el repositorio**:
    ```bash
-   git clone [<URL_DEL_REPOSITORIO>](https://github.com/javirub/Spring-Backend-Hospital.git)
+   git clone https://github.com/javirub/Spring-Backend-Hospital.git
 3. **Levantar los contenedores**:
   ```bash
   docker-compose up
